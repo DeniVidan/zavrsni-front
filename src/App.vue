@@ -1,11 +1,42 @@
 <template>
   <nav>
-<!--     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/login">Login</router-link> -->
+    <div class="navbar" v-if="auth.authenticated">
+      <div class="profile">profile</div>
+
+      <div class="search-bar">
+        <input type="search">
+      </div>
+
+      <div class="logout">
+          <font-awesome-icon @click="logout()" icon="sign-out-alt" />
+      </div>
+
+    </div>
+    <router-view />
   </nav>
-  <router-view />
+  
 </template>
+
+<script>
+import {Auth} from "./services/services"
+export default {
+  name: "App",
+  data() {
+    return {
+      auth: Auth.state,
+
+    }
+  },
+  methods: {
+    logout(){
+      Auth.logout()
+      console.log("User logged out!")
+      this.$router.go();
+    }
+  },
+}
+</script>
+
 
 <style>
 #app {
@@ -29,4 +60,21 @@ nav a {
 nav a.router-link-exact-active {
   color: #42b983;
 }
+.navbar {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+.profile {
+  background-color: white;
+}
+.search-bar > input {
+  background-color: white;
+}
+.logout{
+  color: rgb(100, 100, 100);
+  font-size: 20px;
+  cursor: pointer;
+}
+
 </style>

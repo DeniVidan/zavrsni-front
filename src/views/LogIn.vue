@@ -55,6 +55,7 @@
 
 <script>
 import axios from "axios";
+import { Auth } from "../services/services";
 
 export default {
   name: "LogIn",
@@ -69,25 +70,18 @@ export default {
   methods: {
     async authUser() {
       this.error = "";
-      if (this.email && this.password) {
-        try {
-          let res = await axios.post("http://localhost:3000/api/auth/user", {
-            email: this.email,
-            password: this.password,
-          });
-          // ovaj if je cisto dok ne radi catch da error pokazuje ko error
+      let result = await Auth.login(this.email, this.password);
 
-          console.log("daj mi res: ", res);
-          if (res.status == 200){
-            this.$router.push({ path: "/" });
-          }
-        } catch (err) {
-          console.error(err.response);
-          this.error = err.response.data.err;
-        }
+      console.log("register result: ", result);
+      if (result.status == 500) {
+        this.error = result.error;
+      } else if (result.status == 401) {
+        this.error = result.error;
+      } else if (result.status == 403) {
+        this.error = result.error;
       } else {
-        this.error = "Please enter all the fields!";
-        console.log("enter all the fields");
+        console.log("User logged in successfully");
+        this.$router.go();
       }
     },
   },
@@ -108,7 +102,7 @@ h2 {
 h2 > b {
   font-weight: bold;
 }
-.error{
+.error {
   background-color: rgb(185, 85, 85);
   color: white;
   font-size: 20px;

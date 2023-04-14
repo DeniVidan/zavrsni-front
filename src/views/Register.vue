@@ -83,6 +83,7 @@
 
 <script>
 import axios from "axios";
+import { Auth } from "../services/services";
 
 
 export default {
@@ -102,30 +103,19 @@ export default {
   methods: {
     async addUser() {
       this.error = ""
-      if (this.firstname && this.lastname && this.email && this.password && this.passwordRepeat) {
-        try {
-          let res = await axios.post("http://localhost:3000/api/add/user",  {
-            firstname: this.firstname,
-            lastname: this.lastname,
-            email: this.email,
-            password: this.password,
-            passwordRepeat: this.passwordRepeat,
-          });
-          // ovaj if je cisto dok ne radi catch da error pokazuje ko error
+      let result = await Auth.register(this.firstname, this.lastname, this.email, this.password, this.passwordRepeat)
 
-            console.log("daj mi res: ", res);
-            if (res.data.status == 200) {
-              const user = res.data.data
-              /* localStorage.setItem("user", JSON.stringify(user)) */
-            }
-          
-        } catch (err) {
-          console.error(err.response.data);
-          this.error = err.response.data.err
-        }
-      } else {
-        this.error = "Please enter all the fields!";
-        console.log("enter all the fields");
+      console.log("register result: ", result)
+      if(result.status == 500){
+        this.error = result.error
+      } else if (result.status == 401){
+        this.error = result.error
+      } else if (result.status == 403){
+        this.error = result.error
+      }
+      else {
+        console.log("User registered successfully")
+        this.$router.push({ path: "/" });
       }
     },
     async getUsers() {
