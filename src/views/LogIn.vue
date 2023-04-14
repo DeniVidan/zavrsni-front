@@ -5,27 +5,40 @@
     </div>
 
     <div class="title">
-      <router-link to="/choose"><font-awesome-icon class="icon" icon="fa-reguler fa-chevron-left" /></router-link>
+      <router-link to="/choose"
+        ><font-awesome-icon class="icon" icon="fa-reguler fa-chevron-left"
+      /></router-link>
       <h1>Login</h1>
     </div>
 
     <div class="login-form">
+      <div class="error">{{ error }}</div>
+
       <label for="">Email</label>
-      <input type="email" name="email" placeholder="Enter your email" />
+      <input
+        v-model="email"
+        type="email"
+        name="email"
+        placeholder="Enter your email"
+      />
       <br />
       <br />
       <label for="">Password</label>
       <input
+        v-model="password"
         type="password"
         name="password"
         placeholder="Enter your password"
       />
       <div class="login-btn">
-        <router-link to="/"><div class="button">Login</div></router-link>
+        <router-link to="#"
+          ><div @click="authUser()" class="button">Login</div></router-link
+        >
         <div class="additional-links">
           <div class="no-account">
-            <router-link to="/register"><u>Don't have an account?</u></router-link>
-            
+            <router-link to="/register"
+              ><u>Don't have an account?</u></router-link
+            >
           </div>
           <div class="forgot-password">
             <u>Forgot your password?</u>
@@ -47,9 +60,37 @@ export default {
   name: "LogIn",
   components: {},
   data() {
-    return {};
+    return {
+      email: "",
+      password: "",
+      error: "",
+    };
   },
-  methods: {},
+  methods: {
+    async authUser() {
+      this.error = "";
+      if (this.email && this.password) {
+        try {
+          let res = await axios.post("http://localhost:3000/api/auth/user", {
+            email: this.email,
+            password: this.password,
+          });
+          // ovaj if je cisto dok ne radi catch da error pokazuje ko error
+
+          console.log("daj mi res: ", res);
+          if (res.status == 200){
+            this.$router.push({ path: "/" });
+          }
+        } catch (err) {
+          console.error(err.response);
+          this.error = err.response.data.err;
+        }
+      } else {
+        this.error = "Please enter all the fields!";
+        console.log("enter all the fields");
+      }
+    },
+  },
   mounted() {},
 };
 </script>
@@ -65,6 +106,12 @@ h2 {
   font-weight: lighter;
 }
 h2 > b {
+  font-weight: bold;
+}
+.error{
+  background-color: rgb(185, 85, 85);
+  color: white;
+  font-size: 20px;
   font-weight: bold;
 }
 .login-form {
@@ -103,7 +150,8 @@ h2 > b {
   border-radius: 18px;
   font-weight: bold;
 }
-.additional-links, a {
+.additional-links,
+a {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -115,9 +163,6 @@ h2 > b {
 .footer {
   color: rgba(255, 255, 255, 0.342);
   margin-top: 100px;
-}
-a {
-  text-decoration: none;
 }
 .title {
   padding-top: 20px;
