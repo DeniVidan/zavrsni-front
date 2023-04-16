@@ -5,7 +5,9 @@ import GetStarted from "../views/GetStarted.vue";
 import ChooseLogin from "../views/ChooseLogin.vue";
 import LogIn from "../views/LogIn.vue";
 import Register from "../views/Register.vue";
+import RegisterAdmin from "../views/RegisterAdmin.vue";
 import HomeView from "../views/HomeView.vue";
+
 import { returnStatement } from "@babel/types";
 
 /* eslint-disable */
@@ -45,6 +47,11 @@ const routes = [
     component: Register,
   },
   {
+    path: "/register/admin",
+    name: "registeradmin",
+    component: RegisterAdmin,
+  },
+  {
     path: "/verify",
     name: "verify",
     component: Verify,
@@ -57,7 +64,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const publicSite = ["/login", "/register"];
+  const publicSite = ["/login", "/register", "/register/admin", "/choose", "/getstarted"];
   const loginRequired = !publicSite.includes(to.path);
   let isAuthenticated = Auth.authenticated()
   console.log(isAuthenticated)

@@ -37,5 +37,7 @@ export default {
 <style scoped>
 .home{
     color: white;
+    margin-top: 40px;
 }
+
 </style>

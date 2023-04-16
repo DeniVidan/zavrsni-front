@@ -12,7 +12,7 @@
         <router-link class="button" style="margin-left: 10px" to="/register"> <b>Register</b> </router-link>
       </div>
       <div>
-        <div class="admin-login">Login as administrator</div>
+        <router-link to="/register/admin"><div class="admin-login">Login as administrator</div></router-link> 
       </div>
     </div>
 

@@ -117,15 +117,22 @@ let Auth = {
   },
 
   getUser() {
-    return JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user){
+      return "nema usera"
+    }
+    return user
   },
   getUserToken() {
     let { token } = Auth.getUser();
     return token;
   },
   getUserEmail() {
-    let { email } = Auth.getUser();
-    return email;
+    let res = Auth.getUser();
+    if(res.email){
+      return res.email;
+    }
+    else return "nema usera"
   },
   authenticated() {
     const user = Auth.getUser();

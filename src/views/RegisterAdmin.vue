@@ -5,10 +5,16 @@
     </div>
 
     <div class="title">
-      <router-link to="/choose"
-        ><font-awesome-icon class="icon" icon="fa-reguler fa-chevron-left"
-      /></router-link>
-      <h1>Register</h1>
+      <div class="first-title">
+        <router-link to="/choose"
+          ><font-awesome-icon class="icon" icon="fa-reguler fa-chevron-left"
+        /></router-link>
+        <h1>Register</h1>
+      </div>
+      <div class="second-title">
+        <div><h2>as </h2></div>
+        <div><h2 style="color: #1E90FF;">administrator</h2></div>
+      </div>
     </div>
 
     <div class="login-form">
@@ -45,6 +51,40 @@
       />
 
       <br />
+
+        <label for="">Business name</label>
+      <input
+        v-model="email"
+        type="text"
+        name="text"
+        placeholder="Enter your business name"
+      />
+
+      <br />
+
+            <div class="fullname" style="margin-top: 0;">
+        <div class="firstname">
+          <label for="">Restaurant name</label>
+          <input
+            v-model="firstname"
+            type="firstname"
+            name="firstname"
+            placeholder="Enter restaurant's name"
+          />
+        </div>
+        &nbsp
+        <div class="lastname">
+          <label for="">Location</label>
+          <input
+            v-model="lastname"
+            type="lastname"
+            name="lastname"
+            placeholder="Enter restaurant's location"
+          />
+        </div>
+      </div>
+      <br />
+
       <label for="">Password</label>
       <input
         v-model="password"
@@ -86,7 +126,7 @@ import axios from "axios";
 import { Auth } from "../services/services";
 
 export default {
-  name: "Register",
+  name: "RegisterAdmin",
   components: {},
   data() {
     return {
@@ -262,8 +302,24 @@ a {
 .title {
   padding-top: 20px;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  flex-direction: column;
   color: white;
+}
+.first-title {
+    display: flex;
+    flex-wrap: nowrap;
+}
+.second-title{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    margin-left: 250px;
+}
+.second-title > div > h2 {
+    font-weight: bolder;
+    margin-top: -20px;
+    margin-left: 10px;
 }
 .icon {
   font-size: 50px;
