@@ -3,7 +3,7 @@
     <div class="navbar" v-if="auth.authenticated">
       <div class="profile">
         <img src="https://picsum.photos/50/50">
-        <div style="color: white; font-size: 13px;">{{ getUserEmail }}</div>
+        <div style="color: white; font-size: 13px;">{{ getUserEmail }} </div>
       </div>
 
       <div class="search-bar">
@@ -31,6 +31,7 @@ export default {
       auth: Auth.state,
       getUserEmail: Auth.getUserEmail(),
       searchItem: "",
+      getUserRole: Auth.getUserRole(),
     };
   },
   methods: {

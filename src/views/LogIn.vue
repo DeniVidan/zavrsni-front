@@ -72,7 +72,7 @@ export default {
       this.error = "";
       let result = await Auth.login(this.email, this.password);
 
-      console.log("register result: ", result);
+      console.log("login result: ", result);
       if (result.status == 500) {
         this.error = result.error;
       } else if (result.status == 401) {
@@ -80,6 +80,7 @@ export default {
       } else if (result.status == 403) {
         this.error = result.error;
       } else {
+        
         console.log("User logged in successfully");
         this.$router.go();
       }

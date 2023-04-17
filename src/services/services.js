@@ -45,6 +45,54 @@ let Auth = {
             firstname: firstname,
             lastname: lastname,
             email: email,
+            role: "user",
+            password: password,
+            passwordRepeat: passwordRepeat,
+          });
+          // ovaj if je cisto dok ne radi catch da error pokazuje ko error
+
+          console.log("daj mi res: ", res);
+          if (res.status == 200) {
+            const user = res.data.result.user;
+            console.log("user: ", user);
+            localStorage.setItem("user", JSON.stringify(user));
+          }
+          return {
+            status: res.status,
+            msg: res.data.msg,
+          };
+        } catch (err) {
+          console.error(err.response.data.err);
+          return {
+            status: err.response.status,
+            error: err.response.data.err,
+          };
+        }
+      } else {
+        console.log("enter all the fields");
+        return {
+          status: 401,
+          error: "Please enter all the fields!",
+        };
+      }
+    }
+  },
+  async registerAdmin(firstname, lastname, email, restaurant_name, location, password, passwordRepeat) {
+    if (password != passwordRepeat) {
+      return {
+        status: 403,
+        error: "Passwords do not match",
+      };
+    } else {
+      if (firstname && lastname && email && password && passwordRepeat && restaurant_name && location) {
+        try {
+          let res = await ServiceAuth.post("/add/admin", {
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            restaurant_name: restaurant_name,
+            location: location,
+            role: "admin",
             password: password,
             passwordRepeat: passwordRepeat,
           });
@@ -95,6 +143,7 @@ let Auth = {
         return {
           status: res.status,
           msg: res.data.msg,
+          role: res.data.result.role
         };
       } catch (err) {
         console.error("error response: ", err.response);
@@ -131,6 +180,13 @@ let Auth = {
     let res = Auth.getUser();
     if(res.email){
       return res.email;
+    }
+    else return "nema usera"
+  },
+  getUserRole() {
+    let res = Auth.getUser();
+    if(res.role){
+      return res.role;
     }
     else return "nema usera"
   },

@@ -12,8 +12,13 @@
         <h1>Register</h1>
       </div>
       <div class="second-title">
-        <div><h2>as </h2></div>
-        <div><h2 style="color: #1E90FF;">administrator</h2></div>
+        <div><h2>as</h2></div>
+        <div><h2 style="color: #1e90ff">administrator</h2></div>
+      </div>
+      <div style="margin: 0px 50px 0px 50px; text-align: start;">
+        This registration form is exclusively for businesses interested in
+        collaborating with us. If you are a <b>user</b>, please proceed to the <u @click="goToLogin()">Login</u> or
+       <u @click="goToRegister()">Register</u> page.
       </div>
     </div>
 
@@ -52,9 +57,9 @@
 
       <br />
 
-        <label for="">Business name</label>
+      <label for="">Business name</label>
       <input
-        v-model="email"
+        v-model="businessName"
         type="text"
         name="text"
         placeholder="Enter your business name"
@@ -62,13 +67,13 @@
 
       <br />
 
-            <div class="fullname" style="margin-top: 0;">
+      <div class="fullname" style="margin-top: 0">
         <div class="firstname">
           <label for="">Restaurant name</label>
           <input
-            v-model="firstname"
-            type="firstname"
-            name="firstname"
+            v-model="restaurant_name"
+            type="text"
+            name="restaurantname"
             placeholder="Enter restaurant's name"
           />
         </div>
@@ -76,9 +81,9 @@
         <div class="lastname">
           <label for="">Location</label>
           <input
-            v-model="lastname"
-            type="lastname"
-            name="lastname"
+            v-model="location"
+            type="location"
+            name="location"
             placeholder="Enter restaurant's location"
           />
         </div>
@@ -102,8 +107,8 @@
         placeholder="Enter your password to comfirm"
       />
       <div class="register-btn">
-        <router-link to="/register"
-          ><div @click="addUser()" class="button">Register</div></router-link
+        <router-link to="/register/admin"
+          ><div @click="addUser()" class="button">Send</div></router-link
         >
         <div class="additional-links">
           <div class="no-account">
@@ -133,6 +138,9 @@ export default {
       firstname: "",
       lastname: "",
       email: "",
+      businessName: "",
+      restaurant_name: "",
+      location: "",
       password: "",
       passwordRepeat: "",
       user: [],
@@ -142,10 +150,12 @@ export default {
   methods: {
     async addUser() {
       this.error = "";
-      let result = await Auth.register(
+      let result = await Auth.registerAdmin(
         this.firstname,
         this.lastname,
         this.email,
+        this.restaurant_name,
+        this.location,
         this.password,
         this.passwordRepeat
       );
@@ -161,22 +171,16 @@ export default {
         console.log("User registered successfully");
         this.$router.go();
       }
-      this.email = "";
-      this.password = "";
-      this.passwordRepeat = "";
     },
-    async getUsers() {
-      try {
-        let res = await axios.get("http://localhost:3000/api/users");
-        console.log("daj mi usere: ", res);
-      } catch (error) {
-        console.log("error za usere: ", error.response);
-      }
+    goToRegister(){
+      this.$router.push({path: "/register"})
     },
+    goToLogin(){
+      this.$router.push({path: "/login"})
+    },
+
   },
-  mounted() {
-    this.getUsers();
-  },
+  mounted() {},
 };
 </script>
 
@@ -307,19 +311,19 @@ a {
   color: white;
 }
 .first-title {
-    display: flex;
-    flex-wrap: nowrap;
+  display: flex;
+  flex-wrap: nowrap;
 }
-.second-title{
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    margin-left: 250px;
+.second-title {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  margin-left: 250px;
 }
 .second-title > div > h2 {
-    font-weight: bolder;
-    margin-top: -20px;
-    margin-left: 10px;
+  font-weight: bolder;
+  margin-top: -20px;
+  margin-left: 10px;
 }
 .icon {
   font-size: 50px;
@@ -329,5 +333,8 @@ a {
   text-decoration: none !important;
   color: white;
   align-self: center;
+}
+u{
+  cursor: pointer;
 }
 </style>

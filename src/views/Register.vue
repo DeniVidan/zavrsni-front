@@ -125,17 +125,17 @@ export default {
       this.password = "";
       this.passwordRepeat = "";
     },
-    async getUsers() {
+/*     async getUsers() {
       try {
         let res = await axios.get("http://localhost:3000/api/users");
         console.log("daj mi usere: ", res);
       } catch (error) {
         console.log("error za usere: ", error.response);
       }
-    },
+    }, */
   },
   mounted() {
-    this.getUsers();
+    /* this.getUsers(); */
   },
 };
 </script>

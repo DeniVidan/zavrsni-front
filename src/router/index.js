@@ -65,16 +65,29 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const publicSite = ["/login", "/register", "/register/admin", "/choose", "/getstarted"];
-  const loginRequired = !publicSite.includes(to.path);
+  const adminSite = []
+  const userSite = ["/"]
+  const userRole = Auth.getUserRole()
   let isAuthenticated = Auth.authenticated()
+
+  const loginRequired = !publicSite.includes(to.path);
+  const adminPath = !adminSite.includes(to.path);
+  const userPath = !userSite.includes(to.path)
+  
   console.log(isAuthenticated)
   if (!isAuthenticated && loginRequired) {
     next("/login");
     return;
   }
   else if (isAuthenticated && !loginRequired) {
-    next("/")
-    return
+    if (userRole != "admin" && adminPath){
+      next("/")
+      return
+    }
+    else if (userRole != "user" && userPath) {
+      next()
+      return
+    }
   }
   next();
 });
