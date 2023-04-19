@@ -167,6 +167,7 @@ let Auth = {
 
   getUser() {
     const user = JSON.parse(localStorage.getItem("user"));
+    //console.log("proba: ", user.rows[0])
     if (!user){
       return "nema usera"
     }
@@ -177,16 +178,17 @@ let Auth = {
     return token;
   },
   getUserEmail() {
-    let res = Auth.getUser();
-    if(res.email){
-      return res.email;
+    let res = Auth.getUser().rows[0].email;
+    if(res){
+      return res;
     }
     else return "nema usera"
   },
   getUserRole() {
-    let res = Auth.getUser();
-    if(res.role){
-      return res.role;
+    let res = Auth.getUser().rows[0].role;
+    //console.log("rola: ", res)
+    if(res != "nema usera"){
+      return res;
     }
     else return "nema usera"
   },

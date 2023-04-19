@@ -7,6 +7,8 @@ import LogIn from "../views/LogIn.vue";
 import Register from "../views/Register.vue";
 import RegisterAdmin from "../views/RegisterAdmin.vue";
 import HomeView from "../views/HomeView.vue";
+import AdminSchedule from "../views/AdminSchedule.vue";
+import Tables from "../views/Tables.vue";
 
 import { returnStatement } from "@babel/types";
 
@@ -56,6 +58,16 @@ const routes = [
     name: "verify",
     component: Verify,
   },
+  {
+    path: "/schedule",
+    name: "adminschedule",
+    component: AdminSchedule,
+  },
+  {
+    path: "/tables",
+    name: "tables",
+    component: Tables,
+  },
 ];
 
 const router = createRouter({
@@ -65,31 +77,29 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const publicSite = ["/login", "/register", "/register/admin", "/choose", "/getstarted"];
-  const adminSite = []
+  const adminSite = ["/schedule", "/tables"]
   const userSite = ["/"]
   const userRole = Auth.getUserRole()
   let isAuthenticated = Auth.authenticated()
 
   const loginRequired = !publicSite.includes(to.path);
-  const adminPath = !adminSite.includes(to.path);
-  const userPath = !userSite.includes(to.path)
+  const adminPath = adminSite.includes(to.path);
+  const userPath = userSite.includes(to.path)
   
-  console.log(isAuthenticated)
+  //console.log(isAuthenticated, userRole, adminPath)
   if (!isAuthenticated && loginRequired) {
     next("/login");
-    return;
+  } else if (isAuthenticated && !loginRequired){
+    next("/")
+  } else if (isAuthenticated && userRole == "user" && adminPath) {
+    console.log("User access denied to admin site")
+    next("/"); // redirect to user site
+  } else if (isAuthenticated && userRole == "admin" && userPath) {
+    console.log("Admin access denied to user site")
+    next("/schedule"); // redirect to admin site
+  } else {
+    next();
   }
-  else if (isAuthenticated && !loginRequired) {
-    if (userRole != "admin" && adminPath){
-      next("/")
-      return
-    }
-    else if (userRole != "user" && userPath) {
-      next()
-      return
-    }
-  }
-  next();
 });
 
 export default router;
