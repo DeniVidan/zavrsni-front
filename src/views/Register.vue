@@ -241,6 +241,7 @@ h2 > b {
   font-size: 24px;
   border-radius: 18px;
   font-weight: bold;
+  text-align: center;
 }
 .additional-links,
 a {
@@ -255,6 +256,7 @@ a {
 .footer {
   color: rgba(255, 255, 255, 0.342);
   margin-top: 100px;
+  text-align: center;
 }
 a {
   text-decoration: none;

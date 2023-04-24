@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    HOME RUTA
+      <restaurant-card v-for="i in is" :key="i"/>
   </div>
 </template>
 
@@ -8,12 +8,16 @@
 // @ is an alias to /src
 import axios from "axios";
 import { Auth, Service } from "../services/services";
+import RestaurantCard from "../components/RestaurantCard.vue"
 
 export default {
   name: "HomeView",
-  components: {},
+  components: {
+    RestaurantCard
+  },
   data() {
     return {
+      is: 3
     }
   },
 
@@ -30,6 +34,7 @@ export default {
 
   mounted() {
     this.getUsers()
+    console.log("localstorage: ", Auth.getUser().email)
   },
 };
 </script>
@@ -37,7 +42,7 @@ export default {
 <style scoped>
 .home{
     color: white;
-    margin-top: 40px;
+    margin-top: 100px;
 }
 
 </style>

@@ -48,6 +48,8 @@ h1 {
 }
 
 .front-image {
+  display: flex;
+  justify-content: center;
   margin-top: 35px;
   margin-bottom: 70px;
 }
@@ -60,6 +62,7 @@ h1 {
   background-color: #1e90ff;
   font-size: 24px;
   border-radius: 25px;
+  text-align: center;
 }
 .login-register {
   display: flex;
@@ -70,10 +73,12 @@ h1 {
   color: rgba(255, 255, 255, 0.452);
   text-decoration: underline;
   font-weight: bold;
+  text-align: center;
 }
 .footer{
     color: rgba(255, 255, 255, 0.342);
     margin-top: 100px;
+    text-align: center;
 }
 a {
   text-decoration: none;

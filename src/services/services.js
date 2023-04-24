@@ -137,7 +137,7 @@ let Auth = {
         console.log("daj mi res: ", res);
         if (res.status == 200) {
           const user = res.data.result;
-          console.log("user: ", user);
+          console.log("userxxx: ", user);
           localStorage.setItem("user", JSON.stringify(user));
         }
         return {
@@ -167,7 +167,7 @@ let Auth = {
 
   getUser() {
     const user = JSON.parse(localStorage.getItem("user"));
-    //console.log("proba: ", user.rows[0])
+    //console.log("proba: ", user)
     if (!user){
       return "nema usera"
     }
@@ -178,19 +178,25 @@ let Auth = {
     return token;
   },
   getUserEmail() {
-    let res = Auth.getUser().rows[0].email;
-    if(res){
-      return res;
+    //console.log("đuzer: ", Auth.getUser())
+
+
+    if(Auth.getUser().email != null){
+      //console.log("ima email: ", Auth.getUser().email)
+      return Auth.getUser().email
+    } else if (Auth.getUser().email == null){
+      //console.log("nema email: ", Auth.getUser().email)
+      return "nema usera"
     }
-    else return "nema usera"
+
   },
   getUserRole() {
-    let res = Auth.getUser().rows[0].role;
+    let res = Auth.getUser().role;
     //console.log("rola: ", res)
-    if(res != "nema usera"){
-      return res;
+    if(res == null){
+      return "nema usera"
     }
-    else return "nema usera"
+    else return res;
   },
   authenticated() {
     const user = Auth.getUser();

@@ -2,6 +2,10 @@
   <div id="error" class="error">{{ error }}</div>
   <div class="termin">
     <div class="card-title">Add termin</div>
+    <div class="card-lr">
+      <div class="left">START</div>
+      <div class="right">END</div>
+    </div>
     <div v-for="(input, index) in inputs" :key="index">
       <input
         type="time"
@@ -16,12 +20,11 @@
         placeholder="End termin"
       />
     </div>
-        
-        <div class="button">
-          <div @click="addInput" class="button-left">ADD TERMIN</div>
-          <div @click="createTermin()" class="button-right">CREATE</div>
-        </div>
-      
+
+    <div class="button">
+      <div @click="addInput" class="button-left">ADD TERMIN</div>
+      <div @click="createTermin()" class="button-right">CREATE</div>
+    </div>
   </div>
 </template>
 
@@ -44,7 +47,7 @@ export default {
         for (let i = 0; i < this.inputs.length - 1; i++) {
           if (this.inputs[i].value1 != "" && this.inputs[i].value2 != "") {
             let res = await Service.post("/create/termin", {
-              restaurant_id: this.currentUser.rows[0].id,
+              restaurant_id: this.currentUser.id,
               start_time: this.inputs[i].value1,
               end_time: this.inputs[i].value2,
             });
@@ -54,7 +57,7 @@ export default {
             return;
           }
         }
-        this.$router.go()
+        this.$router.go();
       } catch (error) {
         console.log(error);
       }
@@ -79,12 +82,13 @@ export default {
     },
     updateInput(index, key, value) {
       this.inputs[index][key] = value;
+      //console.log("update input: ", this.inputs[index][key])
     },
   },
   computed: {},
 
   mounted() {
-    console.log("current user id addtermin", this.currentUser.rows[0].id);
+    //console.log("current user id addtermin", this.currentUser.id);
   },
 };
 </script>
@@ -98,15 +102,26 @@ input {
   font-weight: bold;
   background-color: white;
   border: 1px solid #333333;
+  width: 134px;
+  font-size: 20px;
 }
 .card-title {
-  font-size: 20px;
   display: flex;
   flex-direction: row;
-  font-size: 18px;
+  font-size: 23px;
   font-weight: bold;
   padding: 10px;
   justify-content: center;
+}
+.card-lr {
+  display: flex;
+  flex-direction: row;
+  font-size: 18px;
+}
+.left,
+.right {
+  width: 50%;
+  font-weight: bold;
 }
 .button {
   display: flex;

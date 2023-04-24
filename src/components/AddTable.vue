@@ -1,29 +1,24 @@
 <template>
   <div class="table">
-    <div class="content">
-      <div class="error">{{ error }}</div>
-      <div class="add-table-card">
-        <div class="card-title">
-          <div class="left">Table size</div>
-          <div class="right">Table quantity</div>
+    <div class="error">{{ error }}</div>
+    <div class="card-title">Add table</div>
+    <div class="add-table-card">
+      <div class="card-lr">
+        <div class="left">SIZE</div>
+        <div class="right">QUANTITY</div>
+      </div>
+      <div class="card-body">
+        <div class="table-size-input">
+          <input v-model="size" type="number" placeholder="Enter number" />
         </div>
-        <div class="card-body">
-          <div class="table-size-input">
-            <input v-model="size" type="number" placeholder="Enter number" />
-          </div>
-          <div class="table-quantity-input">
-            <input
-              v-model="quantity"
-              type="number"
-              placeholder="Enter number"
-            />
-          </div>
+        <div class="table-quantity-input">
+          <input v-model="quantity" type="number" placeholder="Enter number" />
         </div>
+      </div>
 
-        <div class="button">
-          <div @click="addTable()" class="button-left">ADD TABLE</div>
-          <div @click="createTables()" class="button-right">CREATE</div>
-        </div>
+      <div class="button">
+        <div @click="addTable()" class="button-left">ADD TABLE</div>
+        <div @click="createTables()" class="button-right">CREATE</div>
       </div>
     </div>
   </div>
@@ -77,19 +72,18 @@ export default {
           "#4BB543";
         this.error = "Tables created successfully";
         try {
-
           for (let j = 0; j < this.tableData.quantity.length; j++) {
             for (let i = 0; i < this.tableData.quantity[j]; i++) {
               let res = await Service.post("/create/tables", {
-                restaurant_id: this.currentUser.rows[0].id,
-                name: "1,",
+                restaurant_id: this.currentUser.id,
+                name: "",
                 size: this.tableData.size[j],
               });
               console.log("create table res: ", res);
               console.log("samo da vidim: ", this.tableData.quantity[0]);
             }
           }
-        this.$router.go()
+          this.$router.go();
         } catch (error) {
           console.log("create tables error: ", error);
         }
@@ -101,7 +95,7 @@ export default {
   },
 
   mounted() {
-    //console.log("current user id", this.currentUser.rows[0].id);
+    //console.log("current user id", this.currentUser.id);
   },
 };
 </script>
@@ -110,22 +104,26 @@ export default {
 * {
   color: white;
 }
-.add-table-card {
+.table {
   background-color: #333333;
   width: 268px;
 }
 .card-title {
+  font-size: 23px;
+  font-weight: bold;
+  padding: 10px;
+}
+.card-lr {
   display: flex;
   flex-direction: row;
   font-size: 18px;
   font-weight: bold;
-  padding: 10px;
+  justify-content: center;
 }
-.left {
-  padding-right: 20px;
-}
+.left,
 .right {
-  padding-left: 20px;
+  width: 50%;
+  font-weight: bold;
 }
 .button {
   display: flex;

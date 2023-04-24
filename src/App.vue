@@ -1,8 +1,8 @@
 <template>
   <nav>
-    <div class="navbar" v-if="auth.authenticated">
+    <div class="navbar" v-if="auth.authenticated && isProfilePath()">
       <div class="profile">
-        <img src="https://picsum.photos/50/50" />
+        <router-link to="/profile"><img src="https://picsum.photos/50/50" /></router-link> 
         <div style="color: white; font-size: 13px">{{ getUserEmail }}</div>
       </div>
 
@@ -24,7 +24,7 @@
     </div>
     <router-view />
 
-    <div class="bottom-nav-wrapper" v-if="!role">
+    <div class="bottom-nav-wrapper" v-if="!role && auth.authenticated">
       <div class="bottom-navigation">
         <router-link style="width: 20px" to="/tables" class="navigation-button">
           <img :src="chairImg" alt="" />
@@ -57,7 +57,7 @@ export default {
       auth: Auth.state,
       getUserEmail: Auth.getUserEmail(),
       searchItem: "",
-      /* getUserRole: Auth.getUserRole(), */
+      getUserRole: Auth.getUserRole(),
       role: null,
       chairImg: chairImg,
       listImg: listImg,
@@ -77,11 +77,26 @@ export default {
     isUser() {
       if (Auth.getUserRole() == "user") {
         this.role = true;
-      } else false;
+      } else if (Auth.getUserRole() == "admin"){
+        this.role = false;
+      }
+      else {
+        this.$router.push({path: "/login"})
+      }
     },
+    
+    
+    isProfilePath() {
+      if(this.$route.path == "/profile"){
+        return false
+      } else return true
+    }
+
+
   },
   mounted() {
     this.isUser();
+    //console.log("trenutna ruta: ", this.$route.path)
   },
 };
 </script>
@@ -105,9 +120,12 @@ export default {
 .profile {
   text-align: center;
 }
-.profile > img {
+.profile > a > img {
   background-color: white;
   border-radius: 30px !important;
+}
+.profile > a {
+  background-color: transparent !important;
 }
 .search-bar {
   display: flex;
