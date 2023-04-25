@@ -67,7 +67,8 @@
               name="password"
               placeholder="Enter your new password"
             />
-            <button @click="editUserInfo()">submit</button>
+            <div class="button"><div class="" @click="editUserInfo()">submit</div></div>
+            
           </div>
         </div>
       </div>
@@ -248,7 +249,6 @@ export default {
 }
 .edit-card {
   margin: 35px auto 35px auto;
-  padding-bottom: 10px;
   background-color: #333333;
   width: 80%;
   border-radius: 20px;
@@ -261,7 +261,8 @@ export default {
   font-weight: bold;
   color: #b3b3b3;
   text-align: left;
-  padding: 10px 0px 0px 20px;
+  padding: 10px 0px 10px 20px;
+  cursor: pointer;
 }
 .login-form {
   display: flex;
@@ -287,5 +288,23 @@ export default {
 .error {
   color: white;
   background-color: red;
+}
+.button {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  
+  
+  
+  
+}
+.button > div {
+background-color: #2e70eb;
+padding: 8px 25px;
+cursor: pointer;
+font-weight: bold;
+color: white;
+border-radius: 10px;
 }
 </style>

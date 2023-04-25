@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <div class="navbar" v-if="auth.authenticated && isProfilePath()">
+    <div class="navbar" v-if="auth.authenticated && isProfilePath() && isRestaurantPath()">
       <div class="profile">
         <router-link to="/profile"><img src="https://picsum.photos/50/50" /></router-link> 
         <div style="color: white; font-size: 13px">{{ getUserEmail }}</div>
@@ -90,7 +90,12 @@ export default {
       if(this.$route.path == "/profile"){
         return false
       } else return true
-    }
+    },
+    isRestaurantPath(){
+      if(this.$route.name == "restaurantopen"){
+        return false
+      } else return true
+    },
 
 
   },
@@ -228,6 +233,7 @@ input:focus {
 }
 nav {
   padding: 30px;
+  background-color: #1a1a1a;
 }
 
 nav a {

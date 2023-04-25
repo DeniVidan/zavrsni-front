@@ -142,6 +142,7 @@ export default {
   border-left: 1px solid grey;
 }
 .card-body {
+  padding: 0;
   display: flex;
   flex-direction: row;
 }

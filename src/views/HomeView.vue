@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-      <restaurant-card v-for="i in is" :key="i"/>
+    <restaurant-card :restaurants="restaurants" />
   </div>
 </template>
 
@@ -8,41 +8,51 @@
 // @ is an alias to /src
 import axios from "axios";
 import { Auth, Service } from "../services/services";
-import RestaurantCard from "../components/RestaurantCard.vue"
+import RestaurantCard from "../components/RestaurantCard.vue";
 
 export default {
   name: "HomeView",
   components: {
-    RestaurantCard
+    RestaurantCard,
   },
   data() {
     return {
-      is: 3
-    }
+      restaurants: [],
+    };
   },
 
   methods: {
     async getUsers() {
       try {
-        let res = await Service.get("/users")
-        console.log("daj mi usere: ", res)
+        let res = await Service.get("/users");
+        console.log("daj mi usere: ", res);
       } catch (error) {
-        console.log("error za usere: ", error.response)
+        console.log("error za usere: ", error.response);
       }
-    }
+    },
+
+    async getRestaurants() {
+      try {
+        let res = await Service.get("/restaurants");
+        console.log("daj mi resturane: ", res.data.result);
+        this.restaurants = res.data.result;
+      } catch (error) {
+        console.log("error za usere: ", error.response);
+      }
+    },
   },
 
   mounted() {
-    this.getUsers()
-    console.log("localstorage: ", Auth.getUser().email)
+    this.getUsers();
+    this.getRestaurants();
+    console.log("localstorage: ", Auth.getUser().email);
   },
 };
 </script>
 
 <style scoped>
-.home{
-    color: white;
-    margin-top: 100px;
+.home {
+  color: white;
+  margin-top: 100px;
 }
-
 </style>

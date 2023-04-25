@@ -1,11 +1,11 @@
 <template>
-  <div class="card">
+  <div class="card" v-for="r in restaurants" :key="r.id">
     <div class="image">
-      <img src="https://picsum.photos/170/170" alt="" />
+      <img src="https://picsum.photos/200/200" alt="" />
     </div>
     <div class="content">
       <div class="title">
-        <h1>Tivoli, <i>Pula</i></h1>
+        <h1>{{ r.restaurant_name }}, <i>{{r.location}}</i></h1>
       </div>
       <div class="text">
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident
@@ -13,7 +13,7 @@
         pariatur.
       </div>
       <div class="interactive">
-        <div class="button">Button</div>
+        <router-link :to="{ name: 'restaurantopen', params: { id: r.id } }" class="button">Button</router-link>
       </div>
     </div>
   </div>
@@ -22,6 +22,9 @@
 <script>
 export default {
   name: "RestaurantCard",
+  props: {
+    restaurants: Object,
+  },
   data() {
     return {};
   },
@@ -33,9 +36,10 @@ export default {
 <style scoped>
 .card {
   display: flex;
+  flex-direction: row;
   margin-bottom: 20px;
   background: #333333;
-  height: 170px;
+  height: 200px;
   max-width: 800px;
 }
 .title {
@@ -51,7 +55,7 @@ i {
     font-size: 20px;
 }
 .button {
-    background-color: #2b67e9;
+    background-color: #1E90FF;
     width: 80px;
     padding: 5px 10px;
     margin: 0;
@@ -60,5 +64,10 @@ i {
     margin-top: 20px;
     text-align: center;
     cursor: pointer;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
 }
+
 </style>

@@ -10,6 +10,7 @@ import HomeView from "../views/HomeView.vue";
 import AdminSchedule from "../views/AdminSchedule.vue";
 import Tables from "../views/Tables.vue";
 import Profile from "../views/Profile.vue";
+import RestaurantOpen from "../views/RestaurantOpen.vue";
 
 import { returnStatement } from "@babel/types";
 
@@ -74,6 +75,11 @@ const routes = [
     name: "profile",
     component: Profile,
   },
+  {
+    path: "/restaurant/:id",
+    name: "restaurantopen",
+    component: RestaurantOpen,
+  },
 ];
 
 const router = createRouter({
@@ -84,7 +90,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const publicSite = ["/getstarted","/login", "/register", "/register/admin", "/choose" ];
   const adminSite = ["/schedule", "/tables"]
-  const userSite = ["/"]
+  const userSite = ["/", "/restaurant"]
   const userRole = Auth.getUserRole()
   let isAuthenticated = Auth.authenticated()
 
