@@ -4,6 +4,7 @@
       <img src="https://picsum.photos/200/200" alt="" />
     </div>
     <div class="content">
+      
       <div class="title">
         <h1>{{ r.restaurant_name }}, <i>{{r.location}}</i></h1>
       </div>
@@ -15,6 +16,8 @@
       <div class="interactive">
         <router-link :to="{ name: 'restaurantopen', params: { id: r.id } }" class="button">Button</router-link>
       </div>
+
+
     </div>
   </div>
 </template>
@@ -41,6 +44,7 @@ export default {
   background: #333333;
   height: 200px;
   max-width: 800px;
+  border-radius: 15px;
 }
 .title {
   display: flex;
@@ -68,6 +72,10 @@ i {
     color: white;
     font-weight: bold;
     border-radius: 5px;
+}
+img {
+  border-bottom-left-radius: 15px;
+  border-top-left-radius: 15px;
 }
 
 </style>
