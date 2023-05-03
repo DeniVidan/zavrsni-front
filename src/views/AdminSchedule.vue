@@ -14,50 +14,67 @@
     </div>
 
     <div class="content">
-
-      <div class="wraper" v-for="(i, group) in groupedTables" :key="i">
-        <table class="" >
-          <div style="font-size: 26px; font-weight: bold;">{{group}}<img style="padding-left: 7px" :src="chairImg" alt=""></div> 
-          <tr>
-            <th></th>
-            <th  style="padding-left: 30px" v-for="termin, index in termins" :key="index">
-              {{ termin.start_time }} - {{ termin.end_time }}
-            </th> 
-          </tr>
-          <tr v-for="table, index in tables" :key="index">
-            <div v-if="table.table_size == group">{{ table.table_name }}</div>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-       
-        </table>
+      
+      <div class="choose-date">
+        <input @change="setDay()" class="date-picker" type="date" v-model="picker">
       </div>
-<div style="background: #ff9499; font-weight: bold; width: 20px; margin-top: 20px">{{ count }}</div>
+     
+<!--         <v-text-field
+          v-model="picker"
+          label="Start date"
+          type="date"
+          @change="display(picker)"
+        ></v-text-field>
+      -->
 
 
 
-
-
-<!--       <div class="group-table-title">
-        <table>
+<!--       <div class="choose-date">
+        <div @click="previous()" class="previous"> {{"<"}} </div>
+        <div class="chosen-date">{{ date }}</div>
+        <div @click="next()" class="next"> > </div>
+      </div>
+ -->
+      <div style="">
+      <div class="wraper" v-for="(i, group) in groupedTables" :key="i">
+        <table class="">
+          <div style="font-size: 26px; font-weight: bold">
+            {{ group }}<img style="padding-left: 7px" :src="chairImg" alt="" />
+          </div>
           <tr>
             <th></th>
-            <th style="padding-left: 30px" v-for="(termin, index) in termins" :key="index">{{ termin.start_time }} - {{ termin.end_time }}</th>
-          </tr>
-          <tr style="display: flex; flex-direction: column; background-color: #333333; margin-bottom: 20px" v-for="(tables, size) in groupedTables" :key="size">
-            <td class="group-table-title">{{ size }} <img :src="chairImg" alt=""> </td>
-            <td class="group-table-content" v-for="table in tables" :key="table.id">{{ table.table_name }}</td>
+            <th
+              style="padding-left: 30px;"
+              v-for="(termin, index) in termins"
+              :key="index"
+            >
+              {{ termin.start_time }} - {{ termin.end_time }}
+            </th>
           </tr>
           
+          <tr v-for="(table, index) in tables" :key="index">
+            <div style="font-size: 20px" v-if="table.table_size == group">{{ table.table_name }}</div>
+            <td style="margin: 20px; background: #464646;" v-for="(termin, index) in termins" :key="index">
+              <div class="table-box" v-for="reservation in reservations" :key="reservation">
+                <div class="reservation" v-if="table.id == reservation.table_id && termin.id == reservation.termin_id && table.table_size == group">
+                  <div >
+                    <div v-if="reservation.firstname"> {{reservation.firstname + ' ' + reservation.lastname}}</div>    
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
         </table>
-      </div> -->
+      </div>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import { Auth, Service } from "../services/services";
 import chairImg from "../assets/chair.png";
+
 
 export default {
   name: "AdminSchedule",
@@ -68,22 +85,38 @@ export default {
       tableNumber: false,
       chairImg: chairImg,
       tables: [],
+      reservations: [],
       groupedTables: {},
       termins: [],
-      count: 0,
+      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      day: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[2],
+      month: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[1],
+      year: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[0],
     };
   },
   methods: {
 
-    counter() {
-      for (let index in this.groupedTables) {
-        /* if(this.tables[i].table_size == this.table[i-1].table.size){
-          this.count++
-        } */
-        console.log("fuckoff: ", index, this.groupedTables[index])
-        this.count++
+    async getReservations() {
+      try {
+        let res = await Service.get("/reservations", {
+          params: {
+            day: this.day,
+            month: this.month,
+            year: this.year,
+            email: this.email,
+            id: this.currentUser.id,
+          },
+        });
+
+        this.reservations = res.data.result;
+        console.log("daj mi restauran reservations: ", this.reservations);
+
+        /* this.reservations.forEach((element) => {
+          console.log(element);
+        }); */
+      } catch (error) {
+        console.log("error za restoran reservations: ", error);
       }
-      
     },
 
     async getRestaurantTables() {
@@ -103,12 +136,12 @@ export default {
         this.tables = res.data.result;
         this.groupedTables = this.groupTablesBySize(this.tables);
         this.termins = this.getTermins(this.tables);
-        this.counter()
+
       } catch (error) {
         console.log("error za restoran tables: ", error);
       }
     },
-        async getRestaurantTermins() {
+    async getRestaurantTermins() {
       try {
         let res = await Service.get("/restaurant/termins", {
           params: {
@@ -147,21 +180,51 @@ export default {
       }
       return Array.from(termins).sort();
     },
+    display(picker){
+      console.log(picker)
+    },
+     setDay() {
+      let temp = this.picker.split("-")
+      this.day = (this.picker.split("-"))[2]
+      this.month = temp[1]
+      this.year = temp[0]
+      console.log("dan: ", this.day, this.month, this.year)
+
+      this.getReservations();
+     }
+
+/*       getDate() {
+      console.log("current date: ", this.date);
+    },
+    next() {
+      let temp = this.date.split("/")
+
+      console.log("temp: ", temp[0])
+    },
+
+    previous() {
+
+    } */
+
+
   },
-  computed: {
+/*   computed: {
     filteredTables() {
       return (group) => {
         return this.tables.filter((table) => {
-          console.log("penis ", table.table_size)
+          console.log(" ", table.table_size);
           return table.table_size === group;
         });
       };
     },
-  },
+  }, */
   mounted() {
     this.getRestaurantTables();
-    this.getRestaurantTermins()
-    console.log("ovo je length: ", this.termins);
+    this.getRestaurantTermins();
+    this.setDay()
+    
+/*     this.getDate() */
+/* console.log("dan: ", this.day, this.month, this.year) */
   },
 };
 </script>
@@ -210,9 +273,33 @@ export default {
 }
 .wraper {
   margin-top: 30px;
+  padding: 20px;
   background-color: #313131;
+  width: 600px;
+  min-width: 400px;
+  border-radius: 15px;
 }
-tr {
-  
+table th, td{
+  font-size: 20px;
+}
+table { 
+    border-collapse: collapse; 
+}
+.choose-date {
+  display: flex;
+  justify-content: flex-start;
+}
+.next, .previous {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.date-picker {
+  color: white;
+  font-size: 25px;
+  background: #464646;
+  padding: 6px 20px 6px 0px;
+  border-radius: 10px;
+
 }
 </style>

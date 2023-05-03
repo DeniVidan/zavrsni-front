@@ -13,7 +13,9 @@
       <div class="title">
         {{ restaurants.restaurant_name }}, <i>{{ restaurants.location }}</i>
       </div>
-
+      <div class="choose-date">
+        <input @change="setDay()" class="date-picker" type="date" v-model="picker">
+      </div>
       <div class="filters">
         <div class="seat-filter">
           <div @click="toggle()" class="seat-title">Seat</div>
@@ -47,7 +49,30 @@
           </div>
         </div>
       </div>
-      <div style="margin-top: 85px; display: flex; flex-wrap: wrap">
+
+      <div v-if="termin_id" class="selected-termin">
+        
+        <div  class="termin-item" style="font-weight: bold; background-color: #1e90ff;">
+          {{start_time + '-' + end_time}}
+        </div>
+        <div
+          style="
+            align-self: center;
+            float: right;
+            display: flex;
+            justify-content: flex-end;
+            height: 40px !important;
+            display: grid;
+            align-content: center;
+          "
+          @click="reserveTable()"
+        >
+          <div style="padding: 8px 0px" class="button">Book</div>
+        </div>
+        <div @click="removeChosenTermin()" style="cursor: pointer; align-content: center; display: grid; background-color: #ff4444; padding: 0px 10px; border-radius: 10px"> <img :src="closeImg" alt=""> </div>
+      </div>
+
+      <div style="margin-top: 85px; margin-bottom: 20px; display: flex; flex-wrap: wrap">
         <div class="chosen-filter" v-for="filter in filter_data" :key="filter">
           <div class="filter-item" v-for="ff in filter" :key="ff">
             <div style="display: flex" @click="remove(ff)">
@@ -61,180 +86,78 @@
         </div>
       </div>
 
-<!--       <div class="wraper">
-        <div v-if="filter_data.value1.length == 0">
-          <h1 style="color: red">Please choose filter!</h1>
-        </div>
-        <div class="group" v-for="(index, group) in groupedTables" :key="index">
-          <div v-for="f in filter_data.value1" :key="f">
-            <div v-if="group == f" class="tables">
-              <div @click="clicked" class="size">
-                {{ group
-                }}<img style="padding-left: 7px" :src="chairImg" alt="" />
-              </div>
-              <div id="card-body" class="hidden">
-                <div class="card" v-for="table in tables" :key="table">
-                  <div class="table" v-if="table.table_size == group">
-                    <div style="width: 80px">size: {{ table.table_size }}</div>
-                    <div
-                      style="
-                        display: flex;
-                        justify-content: space-between;
-                        margin-left: 30px;
-                        width: 80%;
-                      "
-                    >
-                      <div
-                        @click="chooseTermin"
-                        class="table-termin"
-                        v-for="termin in termins"
-                        :key="termin"
-                      >
-                        <div
-                          v-for="reservation in reservations"
-                          :key="reservation"
-                        >
-                          <div v-if="reservation.reservation_id">
-                            {{ termin.start_time }} - {{ termin.end_time }}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div
-                      style="cursor: pointer; background: #1e90ff; width: 50px"
-                    >
-                      YES
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
-
-      <!--       <div  style="display: flex; flex-direction: column" class="cigan">
-        <div v-for="reservation in reservations" :key="reservation">
-          <div v-for="(index, group, s) in groupedTables" :key="index">
-            
-            <div v-if="group == reservation.table_size">
-              <div>
-
-              </div>
-              {{group + "----" + reservation.table_name}} <br>
-              --
-            </div>
-          </div>
-        </div>
-
-      </div> -->
-
-      <!--   <div class="wraper">
-        <div v-if="filter_data.value1.length == 0">
-          <h1 style="color: red">Please choose filter!</h1>
-        </div>
-        <div class="group" v-for="(index, group) in groupedTables" :key="index">
-          <div v-for="f in filter_data.value1" :key="f">
-            <div v-if="group == f" class="tables">
-              <div @click="clicked" class="size">
-                {{ group
-                }}<img style="padding-left: 7px" :src="chairImg" alt="" />
-              </div>
-              <div id="card-body" class="hidden">
-                <div class="card" v-for="table in tables" :key="table">
-                 
-                  <div class="table" v-if="table.table_size == group">
-                    <div style="width: 80px">size: {{ table.table_size }}</div>
-                    <div
-                      style="
-                        display: flex;
-                        justify-content: space-between;
-                        margin-left: 30px;
-                        width: 80%;
-                      "
-                    >
-                      <div
-                        @click="chooseTermin"
-                        class="table-termin"
-                        v-for="termin in termins"
-                        :key="termin"
-                      >
-                       
-                          <div>
-                            <div v-for="reservation in reservations" :key="reservation">
-                              <div v-if="termin.id != reservation.termin_id">
-                                {{ termin.start_time }} - {{ termin.end_time }}
-                              </div>
-                            </div>
-                            
-
-                          </div>
-                        
-                      </div>
-                    </div>
-
-                    <div
-                      style="cursor: pointer; background: #1e90ff; width: 50px"
-                    >
-                      YES
-                    </div>
-                  </div>
-                 
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
- -->
-
-      <!-- 
-  <div class="kita" v-for="table in tables" :key="table">
-    <div v-for="index, group in groupedTables" :key="index">
-      <div v-if="table.table_size == group">
-        {{table.table_name}}
-        <div v-for="termin in termins" :key="termin">
-
-          <div v-for="reservation in reservations" :key="reservation">
-            <div v-if="termin.id == reservation.termin_id">{{termin.start_time}}</div>
-          </div>
-    
-        </div>      
-        <br>  
-      </div> 
-    </div>
-  </div> -->
-
       <div class="wraper">
-
+        <div v-if="filter_data.value1.length == 0" style="font-size: 30px; font-weight: bold; color: red;">Please select seat and termin filter</div>
         <div class="tables">
-        <div class="group" style="background: #222222; margin-bottom: 17px; border-radius: 10px" 
-          v-for="(reservations, n) in groupedReservations"
-          :key="reservations"
-        >
-          <div class="size" @click="clicked">
-            {{ n }}
-            <img style="padding-left: 7px" :src="chairImg" alt="" />
-          </div>
-          <div id="card-body" class="hidden">
-            <div
-              class="card"
-              v-for="(reservation, k, l) in reservations"
-              :key="reservation"
-            >
-             <p style="align-self: center"> SIZE: {{ reservation[l].table_size }} |</p>
-              <div class="termin-wraper">
-                <div class="termins" v-for="r in reservation" :key="r">
-                  <div class="termin-item" v-if="!r.reservation_id">
-                    <b>{{ r.start_time + "-" + r.end_time }}</b>
+          <div
+            class="group"
+            style="
+              background: #222222;
+              margin-bottom: 17px;
+              border-radius: 10px;
+            "
+            v-for="(reservations, n) in groupedReservations"
+            :key="reservations"
+          >
+    	      
+            <div v-for="ff in filter_data.value1" :key="ff">
+            <div v-if="n == ff || filter_data.value1.length == 0">
+
+            
+            <div class="size" @click="clicked">
+              {{ n }}
+              <img style="padding-left: 7px" :src="chairImg" alt="" />
+            </div>
+            <div id="card-body" class="hidden">
+              <div
+                class="card"
+                v-for="(reservation, k, l) in reservations"
+                :key="reservation"
+              >
+                <div class="one-table" v-if="checkReservation(reservation)">
+                  <!-- {{reservation[l].reservation_id}} -->
+                  <p style="align-self: center; width: 70px">
+                    SIZE: {{ reservation[l].table_size }}
+                  </p>
+                  <div class="termin-wraper">
+                    <div
+                      class="termins"
+                      v-for="(r, br) in reservation"
+                      :key="br"
+                    >
+
+                      <div v-for="f2 in filter_data.value2" :key="f2">
+                      <div
+                        id="termin"
+                        class="termin-item"
+                        v-if="f2 == (r.start_time + '-' + r.end_time)"
+                        @click="changeColor"
+                      >
+                        <b
+                          @click="
+                            chooseTermin(
+                              r.termin_id,
+                              r.tables_id,
+                              r.restaurant_id,
+                              r.start_time,
+                              r.end_time
+                            )
+                          "
+                          >{{ r.start_time + "-" + r.end_time }}</b
+                        >
+                      </div>
+</div>
+
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+</div>
+</div>
+
           </div>
         </div>
-      </div>
       </div>
     </div>
   </div>
@@ -270,11 +193,23 @@ export default {
       },
       chairImg: chairImg,
       closeImg: closeImg,
-      active: false,
+
       proba: {
         value1: [],
         value2: [],
       },
+      termin_id: null,
+      table_name: "",
+      restaurant_id: null,
+      start_time: "",
+      end_time: "",
+      test: true,
+      br: 0,
+      selected: null,
+      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      day: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[2],
+      month: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[1],
+      year: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[0],
     };
   },
   methods: {
@@ -334,16 +269,36 @@ export default {
         console.log("error za restoran termins: ", error);
       }
     },
+
+
+
+
+
+     setDay() {
+      let temp = this.picker.split("-")
+      this.day = (this.picker.split("-"))[2]
+      this.month = temp[1]
+      this.year = temp[0]
+      console.log("dan: ", this.day, this.month, this.year)
+
+      this.getReservations()
+     },
     async getReservations() {
       try {
         let res = await Service.get("/restaurant/reservations", {
           params: {
             email: this.email,
             id: this.restaurants.id,
+            day: this.day,
+            month: this.month,
+            year: this.year,
           },
         });
 
         this.reservations = res.data.result;
+        this.groupedReservations = this.groupTablesBySizeAndName(
+          this.reservations
+        );
         console.log("daj mi restauran reservations: ", this.reservations);
       } catch (error) {
         console.log("error za restoran reservations: ", error);
@@ -378,12 +333,9 @@ export default {
       if (!this.filter_data.value1.includes(item)) {
         this.filter_data.value1.push(item);
       }
-      //console.log("filter: ", this.filter_data);
     },
     applyFilterTermin(item1, item2) {
       let temp = item1 + "-" + item2;
-      /* temp = temp.split("-")
-      console.log("terljnim: ", temp) */
 
       if (!this.filter_data.value2.includes(temp)) {
         this.filter_data.value2.push(temp);
@@ -400,8 +352,6 @@ export default {
         console.log("remve termin: ", num);
         this.filter_data.value2.splice(num, 1);
       }
-
-      /*       this.setFilter() */
     },
 
     goBack() {
@@ -425,29 +375,97 @@ export default {
       }
     },
 
-    /*     setFilter() {
-      if (this.filter_data.length == 0) {
-        return true;
-      } else {
-        return false;
-        }
-    }, */
-    chooseTermin(event) {
-      this.selectedTermin = event.target.innerText;
-      console.log(event.target.innerText);
+    chooseTermin(termin_id, table_id, restaurant_id, start_time, end_time) {
+      this.termin_id = termin_id;
+      this.table_id = table_id;
+      this.restaurant_id = restaurant_id;
+      this.start_time = start_time;
+      this.end_time = end_time
+      console.log("Chosen termin_id: ", this.termin_id);
+      console.log("Chosen table_id: ", this.table_id);
+      console.log("Chosen restaurant_id: ", this.restaurant_id);
+      console.log("Current user: ", this.currentUser.id);
+      const timeElapsed = Date.now();
+      const today = new Date(timeElapsed);
+      console.log("current date: ", today.toLocaleDateString());
     },
-    reserveTable() {},
+    async reserveTable() {
+      if (this.termin_id != null) {
+        try {
+          let res = await Service.post("/make/reservation", {
+            restaurant_id: this.restaurant_id,
+            user_id: this.currentUser.id,
+            table_id: this.table_id,
+            termin_id: this.termin_id,
+            day: this.day,
+            month: this.month,
+            year: this.year,
+          });
+
+          console.log("napravi rezervaciju res: ", res);
+        } catch (error) {
+          console.log(error.response);
+        }
+      } else {
+        console.log("choose termin idiot");
+      }
+      this.$router.go()
+    },
+
+    checkReservation(reservation) {
+      let br = 0;
+      reservation.forEach((element) => {
+        if (element.reservation_id == null) {
+          this.test = true;
+        } else {
+          this.test = false;
+          br++;
+        }
+      });
+      if (br == this.termins.length) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    changeColor(event) {
+      const elements = document.querySelectorAll(".termin-item");
+      elements.forEach((element) => {
+        element.classList.remove("active");
+      });
+      const target = event.currentTarget;
+      target.classList.add("active");
+    },
+
+    removeChosenTermin() {
+      this.termin_id = null;
+      this.table_id = null;
+      this.restaurant_id = null;
+      this.start_time = "";
+      this.end_time = ""
+      const elements = document.querySelectorAll(".termin-item");
+      elements.forEach((element) => {
+        element.classList.remove("active");
+      });
+    },
+
+
+
   },
 
   mounted() {
     console.log("id od restorana: ", this.$route.params.id);
     this.getRestaurant();
+
     /*     this.setFilter() */
   },
 };
 </script>
 
 <style scoped>
+.active {
+  background-color: #1e90ff !important;
+}
 .container {
   color: white;
 }
@@ -515,20 +533,26 @@ i {
 }
 #card-body {
   margin-bottom: 10px;
-  padding-bottom: 1px;
+  padding: 10px;
+  padding-bottom: 0px;
 }
 .card {
   display: flex;
-  padding: 20px;
-  margin: 10px;
-  background-color: #333333;
+  background-color: transparent;
   font-size: 20px;
   border-radius: 10px;
+}
+.one-table {
+  background: #333333;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;
+  display: flex;
 }
 .tables {
   background: #1a1a1a !important;
   padding-bottom: 5px;
-
 }
 .table {
   display: flex;
@@ -572,8 +596,7 @@ i {
 }
 .termin-wraper {
   display: flex;
-  width: 90%;
-  
+  width: 91%;
 }
 
 .termin-item {
@@ -582,6 +605,36 @@ i {
   border-radius: 10px;
   margin-left: 20px;
   cursor: pointer;
-  
+}
+.termin-item:hover {
+  background-color: #8b8b8b;
+}
+
+.button {
+  color: white;
+  background-color: #4bb543;
+  cursor: pointer;
+  width: 90px;
+  padding: 5px 10px;
+  text-align: center;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.selected-termin {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.choose-date {
+  display: flex;
+  justify-content: flex-start;
+}
+.date-picker {
+  color: white;
+  font-size: 25px;
+  background: #464646;
+  padding: 6px 20px 6px 20px;
+  border-radius: 10px;
+
 }
 </style>

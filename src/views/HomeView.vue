@@ -40,10 +40,20 @@ export default {
         console.log("error za usere: ", error.response);
       }
     },
+/* 
+    async getRating() {
+      try {
+        let res = await Service.get("/restaurant/rating", {
+          params: {
+            restaurant_id: 
+          }
+        });
+      } catch (error) {}
+    }, */
   },
 
   mounted() {
-    this.getUsers();
+    //this.getUsers();
     this.getRestaurants();
     console.log("localstorage: ", Auth.getUser().email);
   },

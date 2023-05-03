@@ -1,12 +1,25 @@
 <template>
   <div class="card" v-for="r in restaurants" :key="r.id">
     <div class="image">
-      <img src="https://picsum.photos/200/200" alt="" />
+      <img src="https://picsum.photos/250/250" alt="" />
     </div>
     <div class="content">
-      
       <div class="title">
-        <h1>{{ r.restaurant_name }}, <i>{{r.location}}</i></h1>
+        <h1>
+          {{ r.restaurant_name }}, <i>{{ r.location }}</i>
+        </h1>
+      </div>
+      <div class="review">
+        <v-rating
+          v-model="r.avg_rating"
+          color="grey"
+          active-color="yellow-accent-4"
+          hover
+          half-increments
+          size="23px"
+          @change="makeRating(r.restaurant_id, r.avg_rating)"
+        ></v-rating>
+        <pre>{{ r.avg_rating }}</pre>
       </div>
       <div class="text">
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident
@@ -14,25 +27,81 @@
         pariatur.
       </div>
       <div class="interactive">
-        <router-link :to="{ name: 'restaurantopen', params: { id: r.id } }" class="button">Button</router-link>
+        <router-link
+          :to="{ name: 'restaurantopen', params: { id: r.restaurant_id } }"
+          class="button"
+          >Button</router-link
+        >
       </div>
-
-
     </div>
   </div>
 </template>
 
 <script>
+import { Auth, Service } from "../services/services";
+
 export default {
   name: "RestaurantCard",
   props: {
     restaurants: Object,
   },
   data() {
-    return {};
+    return {
+      currentUser: Auth.getUser(),
+      
+    };
   },
-  methods: {},
-  mounted() {},
+  methods: {
+
+    async getRating(restaurants_id) {
+        try {
+          let res = await Service.get("/restaurant/rating", {
+              params: {
+                restaurant_id: restaurants_id,
+                user_id: this.currentUser.id,
+              }
+          });
+          console.log("GET RATE: ", res.data.result[0])
+          if(res.data.result[0].rate == null) {
+            return true
+          } else return false
+          
+        } catch (error) {
+          console.log(error)
+        }
+    },
+
+    async makeRating(restaurants_id, rate) {
+      
+      if (await this.getRating(restaurants_id) == true){
+        try {
+        let res = await Service.post("/rate", {
+            restaurant_id: restaurants_id,
+            user_id: this.currentUser.id,
+            rate: rate,
+        });
+
+        console.log("rate res: ", res)
+      } catch (error) {
+        console.log(error)
+      }
+      } else {
+        console.error("THIS USER HAS ALREADY RATED THIS RESTAURANT!")
+        alert("You have already rated this restaurant!");
+      }
+      
+    },
+    
+    test() {
+      console.log("testiramo===========!")
+    }
+  },
+  mounted() {
+    this.restaurants.forEach(element => {
+      console.log("cigan: ", element)
+    });
+    
+  },
 };
 </script>
 
@@ -42,40 +111,49 @@ export default {
   flex-direction: row;
   margin-bottom: 20px;
   background: #333333;
-  height: 200px;
+  height: 250px;
   max-width: 800px;
   border-radius: 15px;
 }
 .title {
   display: flex;
   flex-direction: row;
-  padding: 10px 20px;
+  padding: 10px 20px 0px 20px;
+}
+.review {
+  display: flex;
+  margin-left: 25px;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.review pre {
+  font-weight: bold;
+  font-size: 20px;
 }
 .text {
-    padding: 0px 10px;
+  padding: 0px 10px;
 }
 i {
-    font-weight: normal;
-    font-size: 20px;
+  font-weight: normal;
+  font-size: 20px;
 }
 .button {
-    background-color: #1E90FF;
-    width: 80px;
-    padding: 5px 10px;
-    margin: 0;
-    float: right;
-    margin-right: 20px;
-    margin-top: 20px;
-    text-align: center;
-    cursor: pointer;
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    border-radius: 5px;
+  background-color: #1e90ff;
+  width: 80px;
+  padding: 5px 10px;
+  margin: 0;
+  float: right;
+  margin-right: 20px;
+  margin-top: 20px;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
 }
 img {
   border-bottom-left-radius: 15px;
   border-top-left-radius: 15px;
 }
-
 </style>
