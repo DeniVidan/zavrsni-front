@@ -38,6 +38,8 @@
       <br />
       <label for="">Email</label>
       <input
+      @change="removeStyle"
+        class="email"
         v-model="email"
         type="email"
         name="email"
@@ -47,6 +49,8 @@
       <br />
       <label for="">Password</label>
       <input
+      @change="removeStyle"
+      class="password"
         v-model="password"
         type="password"
         name="password"
@@ -56,6 +60,8 @@
       <br />
       <label for="">Comfirm password</label>
       <input
+      @change="removeStyle"
+      class="password"
         v-model="passwordRepeat"
         type="password"
         name="password"
@@ -100,8 +106,20 @@ export default {
     };
   },
   methods: {
+    removeStyle(event){
+      let temp = event.srcElement.className
+      if(temp) {
+        const elements = document.querySelectorAll(`.${temp}`);
+        elements.forEach(element => {
+          element.style.border = "none";
+        });
+      }
+    },
+
     async addUser() {
       this.error = "";
+
+
       let result = await Auth.register(
         this.firstname,
         this.lastname,
@@ -112,20 +130,43 @@ export default {
 
       console.log("register result: ", result);
       if (result.status == 500) {
+        const elements = document.querySelectorAll('.email');
+        elements.forEach(element => {
+          element.style.border = "1px solid red";
+        });
         this.error = result.error;
       } else if (result.status == 401) {
         this.error = result.error;
       } else if (result.status == 403) {
+        const elements = document.querySelectorAll('.password');
+        elements.forEach(element => {
+          element.style.border = "1px solid red";
+        });
+
         this.error = result.error;
-      } else {
+      } else if (result.status == 800) {
+        const elements = document.querySelectorAll('.email');
+        elements.forEach(element => {
+          element.style.border = "1px solid red";
+        });
+        this.error = result.error
+      }
+      else if (result.status == 801) {
+        const elements = document.querySelectorAll('.password');
+        elements.forEach(element => {
+          element.style.border = "1px solid red";
+        });
+        this.error = result.error
+      }
+      
+      else {
         console.log("User registered successfully");
         this.$router.go();
       }
-      this.email = "";
       this.password = "";
       this.passwordRepeat = "";
     },
-/*     async getUsers() {
+    /*     async getUsers() {
       try {
         let res = await axios.get("http://localhost:3000/api/users");
         console.log("daj mi usere: ", res);
@@ -158,6 +199,7 @@ h2 > b {
   color: white;
   font-size: 20px;
   font-weight: bold;
+  text-align: center;
 }
 .fullname {
   display: flex;

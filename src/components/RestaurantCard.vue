@@ -11,12 +11,14 @@
       </div>
       <div class="review">
         <v-rating
+        id="rating"
           v-model="r.avg_rate"
           color="grey"
           active-color="yellow-accent-4"
           hover
           half-increments
           size="23px"
+          
           @change="makeRating(r.restaurant_id, r.avg_rate)"
         ></v-rating><pre>{{ r.avg_rate }} <span style="font-size: 15px; font-weight: normal;" v-if="!r.avg_rate">NOT RATED YET</span></pre>
         
@@ -66,7 +68,11 @@ export default {
           console.log("GET RATE: ", res.data.result.length)
           if(res.data.result.length == 0) {
             return true
-          } else return false
+          } else {
+/*             const element = document.getElementById("rating");
+            element.setAttribute("readonly", ""); */
+            return false
+          }
           
         } catch (error) {
           console.log(error)

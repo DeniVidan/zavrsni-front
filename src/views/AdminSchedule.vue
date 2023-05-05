@@ -235,6 +235,7 @@ export default {
 }
 .schedule {
   color: white;
+  margin-bottom: 100px;
 }
 .title {
   margin-top: -50px;

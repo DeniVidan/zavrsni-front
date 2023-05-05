@@ -11,7 +11,7 @@ let Service = axios.create({
 });
 
 Service.interceptors.request.use((request) => {
-    const token = Auth.getUserToken()
+  const token = Auth.getUserToken();
   console.log("daj token: ", token);
   try {
     request.headers["Authorization"] = "Bearer " + token;
@@ -40,32 +40,48 @@ let Auth = {
       };
     } else {
       if (firstname && lastname && email && password && passwordRepeat) {
-        try {
-          let res = await ServiceAuth.post("/add/user", {
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            role: "user",
-            password: password,
-            passwordRepeat: passwordRepeat,
-          });
-          // ovaj if je cisto dok ne radi catch da error pokazuje ko error
+        var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (email.match(mailformat)) {
+          if(password.length >= 8) {
+                      try {
+            let res = await ServiceAuth.post("/add/user", {
+              firstname: firstname,
+              lastname: lastname,
+              email: email,
+              role: "user",
+              password: password,
+              passwordRepeat: passwordRepeat,
+            });
+            // ovaj if je cisto dok ne radi catch da error pokazuje ko error
 
-          console.log("daj mi res: ", res);
-          if (res.status == 200) {
-            const user = res.data.result.user;
-            console.log("user: ", user);
-            localStorage.setItem("user", JSON.stringify(user));
+            console.log("daj mi res: ", res);
+            if (res.status == 200) {
+              const user = res.data.result.user;
+              console.log("user: ", user);
+              localStorage.setItem("user", JSON.stringify(user));
+            }
+            return {
+              status: res.status,
+              msg: res.data.msg,
+            };
+          } catch (err) {
+            console.error(err.response.data.err);
+            return {
+              status: err.response.status,
+              error: err.response.data.err,
+            };
           }
+          } else {
+            return {
+              status: 801,
+              error: "Password must be at least 8 characters"
+            }
+          }
+
+        } else {
           return {
-            status: res.status,
-            msg: res.data.msg,
-          };
-        } catch (err) {
-          console.error(err.response.data.err);
-          return {
-            status: err.response.status,
-            error: err.response.data.err,
+            status: 800,
+            error: "Not valid email form",
           };
         }
       } else {
@@ -77,14 +93,30 @@ let Auth = {
       }
     }
   },
-  async registerAdmin(firstname, lastname, email, restaurant_name, location, password, passwordRepeat) {
+  async registerAdmin(
+    firstname,
+    lastname,
+    email,
+    restaurant_name,
+    location,
+    password,
+    passwordRepeat
+  ) {
     if (password != passwordRepeat) {
       return {
         status: 403,
         error: "Passwords do not match",
       };
     } else {
-      if (firstname && lastname && email && password && passwordRepeat && restaurant_name && location) {
+      if (
+        firstname &&
+        lastname &&
+        email &&
+        password &&
+        passwordRepeat &&
+        restaurant_name &&
+        location
+      ) {
         try {
           let res = await ServiceAuth.post("/add/admin", {
             firstname: firstname,
@@ -143,7 +175,7 @@ let Auth = {
         return {
           status: res.status,
           msg: res.data.msg,
-          role: res.data.result.role
+          role: res.data.result.role,
         };
       } catch (err) {
         console.error("error response: ", err.response);
@@ -168,10 +200,10 @@ let Auth = {
   getUser() {
     const user = JSON.parse(localStorage.getItem("user"));
     //console.log("proba: ", user)
-    if (!user){
-      return "nema usera"
+    if (!user) {
+      return "nema usera";
     }
-    return user
+    return user;
   },
   getUserToken() {
     let { token } = Auth.getUser();
@@ -180,23 +212,20 @@ let Auth = {
   getUserEmail() {
     //console.log("đuzer: ", Auth.getUser())
 
-
-    if(Auth.getUser().email != null){
+    if (Auth.getUser().email != null) {
       //console.log("ima email: ", Auth.getUser().email)
-      return Auth.getUser().email
-    } else if (Auth.getUser().email == null){
+      return Auth.getUser().email;
+    } else if (Auth.getUser().email == null) {
       //console.log("nema email: ", Auth.getUser().email)
-      return "nema usera"
+      return "nema usera";
     }
-
   },
   getUserRole() {
     let res = Auth.getUser().role;
     //console.log("rola: ", res)
-    if(res == null){
-      return "nema usera"
-    }
-    else return res;
+    if (res == null) {
+      return "nema usera";
+    } else return res;
   },
   authenticated() {
     const user = Auth.getUser();

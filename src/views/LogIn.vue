@@ -57,9 +57,11 @@
 import axios from "axios";
 import { Auth } from "../services/services";
 
+
 export default {
   name: "LogIn",
   components: {},
+
   data() {
     return {
       email: "",
@@ -67,6 +69,7 @@ export default {
       error: "",
     };
   },
+
   methods: {
     async authUser() {
       this.error = "";

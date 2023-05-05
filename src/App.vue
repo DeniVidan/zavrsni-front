@@ -151,6 +151,7 @@ export default {
   box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
+  background: #212121;
 }
 
 .navigation-button {
