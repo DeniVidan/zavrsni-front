@@ -14,8 +14,8 @@ import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 
 
 library.add(faUserSecret)
-
 loadFonts()
+
 
 createApp(App)
   .component('font-awesome-icon', FontAwesomeIcon)

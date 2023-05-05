@@ -1,5 +1,5 @@
 <template>
-  <div class="card" v-for="r in restaurants" :key="r.id">
+  <div class="card" v-for="r in filteredRestaurants" :key="r.id">
     <div class="image">
       <img src="https://picsum.photos/250/250" alt="" />
     </div>
@@ -11,15 +11,15 @@
       </div>
       <div class="review">
         <v-rating
-          v-model="r.avg_rating"
+          v-model="r.avg_rate"
           color="grey"
           active-color="yellow-accent-4"
           hover
           half-increments
           size="23px"
-          @change="makeRating(r.restaurant_id, r.avg_rating)"
-        ></v-rating>
-        <pre>{{ r.avg_rating }}</pre>
+          @change="makeRating(r.restaurant_id, r.avg_rate)"
+        ></v-rating><pre>{{ r.avg_rate }} <span style="font-size: 15px; font-weight: normal;" v-if="!r.avg_rate">NOT RATED YET</span></pre>
+        
       </div>
       <div class="text">
         Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident
@@ -43,7 +43,8 @@ import { Auth, Service } from "../services/services";
 export default {
   name: "RestaurantCard",
   props: {
-    restaurants: Object,
+    filteredRestaurants: Object,
+    searchItem: String
   },
   data() {
     return {
@@ -55,14 +56,15 @@ export default {
 
     async getRating(restaurants_id) {
         try {
+          console.log("dada: ", this.currentUser.id)
           let res = await Service.get("/restaurant/rating", {
               params: {
                 restaurant_id: restaurants_id,
                 user_id: this.currentUser.id,
               }
           });
-          console.log("GET RATE: ", res.data.result[0])
-          if(res.data.result[0].rate == null) {
+          console.log("GET RATE: ", res.data.result.length)
+          if(res.data.result.length == 0) {
             return true
           } else return false
           
@@ -70,6 +72,7 @@ export default {
           console.log(error)
         }
     },
+
 
     async makeRating(restaurants_id, rate) {
       
@@ -97,10 +100,10 @@ export default {
     }
   },
   mounted() {
-    this.restaurants.forEach(element => {
+    this.filteredRestaurants.forEach(element => {
       console.log("cigan: ", element)
     });
-    
+    console.log(this.currentUser)
   },
 };
 </script>
