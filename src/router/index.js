@@ -11,8 +11,10 @@ import AdminSchedule from "../views/AdminSchedule.vue";
 import Tables from "../views/Tables.vue";
 import Profile from "../views/Profile.vue";
 import RestaurantOpen from "../views/RestaurantOpen.vue";
+import Pending from "../views/Pending.vue";
 
 import { returnStatement } from "@babel/types";
+import { penFancy } from "fontawesome";
 
 /* eslint-disable */
 const routes = [
@@ -80,6 +82,11 @@ const routes = [
     name: "restaurantopen",
     component: RestaurantOpen,
   },
+  {
+    path: "/pending",
+    name: "pending",
+    component: Pending,
+  },
 ];
 
 const router = createRouter({
@@ -88,7 +95,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const publicSite = ["/getstarted","/login", "/register", "/register/admin", "/choose" ];
+  const publicSite = ["/getstarted", "/login", "/register", "/register/admin", "/choose" ];
   const adminSite = ["/schedule", "/tables"]
   const userSite = ["/", "/restaurant"]
   const userRole = Auth.getUserRole()

@@ -392,7 +392,7 @@ export default {
     async reserveTable() {
       if (this.termin_id != null) {
         try {
-          let res = await Service.post("/make/reservation", {
+          let res = await Service.post("/add/pending", {
             restaurant_id: this.restaurant_id,
             user_id: this.currentUser.id,
             table_id: this.table_id,

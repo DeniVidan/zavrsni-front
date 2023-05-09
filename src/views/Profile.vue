@@ -19,7 +19,7 @@
         <div class="profilepic">
           <img
             class="profilepic__image"
-            src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+            :src="currentImage"
             width="170"
             height="170"
             alt="Profile picture"
@@ -36,6 +36,9 @@
             ref="fileInput"
             style="display: none"
           />
+        </div>
+        <div v-if="base64compressed" class="button">
+          <div @click="saveImage()" style="margin: auto">save foto</div>
         </div>
         <div class="name">
           {{ currentUser.firstname }} {{ currentUser.lastname }}
@@ -106,6 +109,7 @@ export default {
       error: "",
       changePass: false,
       base64compressed: null,
+      currentImage: null,
     };
   },
   methods: {
@@ -128,7 +132,7 @@ export default {
           this.lastname != Auth.getUser().lastname ||
           this.changePass
         ) {
-          console.log("faking id: ", Auth.getUser().id);
+          //console.log("daj user id: ", Auth.getUser().id);
           let res = await Service.put("/edit/user", {
             id: Auth.getUser().id,
             firstname: this.firstname,
@@ -195,14 +199,43 @@ export default {
         reader.onload = () => {
           this.base64compressed = reader.result;
           this.$refs.profilePic.setAttribute("src", this.base64compressed);
-          console.log("slika: ", this.base64compressed);
+          //console.log("slika: ", this.base64compressed);
         };
       } catch (error) {
         console.log("error compresion: ", error);
       }
     },
+    async getImage() {
+      try {
+        let res = await Service.get("/get/profile/image", {
+          params: {
+            user_id: this.currentUser.id,
+          },
+        });
+        //console.log("get image res: ", res.data.result[0].image)
+
+        this.currentImage = res.data.result[0].image;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async saveImage() {
+      try {
+        let res = await Service.put("/change/profile/image", {
+          user_id: this.currentUser.id,
+          image: this.base64compressed,
+        });
+
+        //console.log("change image res: ", res);
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
-  mounted() {},
+  mounted() {
+    this.getImage();
+  },
 };
 </script>
 

@@ -6,7 +6,7 @@
     >
       <div class="profile">
         <router-link to="/profile"
-          ><img src="https://picsum.photos/50/50"
+          ><img :src="currentImage" width="50" height="50"
         /></router-link>
         <div style="color: white; font-size: 13px">{{ getUserEmail }}</div>
       </div>
@@ -27,7 +27,7 @@
           <img :src="listImg" alt="" />
           <span>Reservations</span>
         </router-link>
-        <router-link to="/settings" class="navigation-button">
+        <router-link to="/pending" class="navigation-button">
           <img :src="pendingImg" alt="" />
           <span>Pending</span>
         </router-link>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { Auth } from "./services/services";
+import { Auth, Service } from "./services/services";
 import chairImg from "./assets/chair.png";
 import listImg from "./assets/list.png";
 import pendingImg from "./assets/pending.png";
@@ -47,6 +47,7 @@ export default {
 
   data() {
     return {
+      currentUser: Auth.getUser(),
       auth: Auth.state,
       getUserEmail: Auth.getUserEmail(),
       searchItem: "",
@@ -55,6 +56,7 @@ export default {
       chairImg: chairImg,
       listImg: listImg,
       pendingImg: pendingImg,
+      currentImage: null,
     };
   },
   methods: {
@@ -62,6 +64,21 @@ export default {
       Auth.logout();
       console.log("User logged out!");
       this.$router.go();
+    },
+
+    async getImage() {
+      try {
+        let res = await Service.get("/get/profile/image", {
+          params: {
+            user_id: this.currentUser.id,
+          },
+        });
+        //console.log("get image res: ", res.data.result[0].image);
+
+        this.currentImage = res.data.result[0].image;
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     isUser() {
@@ -91,6 +108,7 @@ export default {
   },
   mounted() {
     this.isUser();
+    this.getImage()
     //console.log("trenutna ruta: ", this.$route.path)
   },
 };

@@ -1,12 +1,12 @@
 import axios from "axios";
 
 let ServiceAuth = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "http://localhost:3030/api",
   timeout: 10000,
 });
 
 let Service = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "http://localhost:3030/api",
   timeout: 10000,
 });
 
