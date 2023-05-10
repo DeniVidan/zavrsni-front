@@ -4,23 +4,47 @@
       <h1>Pending</h1>
     </div>
     <div class="content">
-        <div class="item" style="background-color: transparent;">
-            <div class="vertical-align"> <b>TABLE NAME</b> </div>
-            <div class="vertical-align"> <b>TERMIN</b> </div>
-            <div class="vertical-align"> <b>GUEST</b> </div>
-            <div class="vertical-align" style="display: flex;">
-               <b>CONFIRM / DECLINE</b> 
-            </div>
+      <div class="item" style="background-color: transparent">
+        <div class="vertical-align"><b>TABLE NAME</b></div>
+        <div class="vertical-align"><b>TERMIN</b></div>
+        <div class="vertical-align"><b>GUEST</b></div>
+        <div class="vertical-align" style="display: flex">
+          <b>CONFIRM / DECLINE</b>
         </div>
-        <div class="item" v-for="p in pending" :key="p" style="padding: 0px 40px">
-            <div class="vertical-align"> {{p.table_name}} </div>
-            <div class="vertical-align">{{p.start_time + '-' + p.end_time}}</div>
-            <div class="vertical-align">{{p.firstname + ' ' + p.lastname}} </div>
-            <div class="vertical-align" style="display: flex;">
-                <img @click="reserveTable(p.pending_id, p.restaurant_id, p.user_id, p.table_id, p.termin_id, p.day, p.month, p.year)" class="btn" :src="checkmark" alt="">
-                <img @click="rejectReservation()" class="btn" :src="xsquare" alt="">
-            </div>
+      </div>
+      <div v-if="pending.length == 0">
+        <h1>No reservations !</h1>
+      </div>
+      <div class="item" v-for="p in pending" :key="p" style="padding: 0px 40px">
+        <div class="vertical-align">{{ p.table_name }}</div>
+        <div class="vertical-align">{{ p.start_time + "-" + p.end_time }}</div>
+        <div class="vertical-align">{{ p.firstname + " " + p.lastname }}</div>
+        <div class="vertical-align" style="display: flex">
+          <img
+            @click="
+              reserveTable(
+                p.pending_id,
+                p.restaurant_id,
+                p.user_id,
+                p.table_id,
+                p.termin_id,
+                p.day,
+                p.month,
+                p.year
+              )
+            "
+            class="btn"
+            :src="checkmark"
+            alt=""
+          />
+          <img
+            @click="rejectReservation(p.pending_id)"
+            class="btn"
+            :src="xsquare"
+            alt=""
+          />
         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -34,10 +58,10 @@ export default {
   name: "Pending",
   data() {
     return {
-        currentUser: Auth.getUser(),
-        checkmark: checkmark,
-        xsquare: xsquare,
-        pending: [],
+      currentUser: Auth.getUser(),
+      checkmark: checkmark,
+      xsquare: xsquare,
+      pending: [],
     };
   },
   methods: {
@@ -64,47 +88,78 @@ export default {
       }
     },
 
-    async reserveTable(pending_id, restaurant_id, user_id, table_id, termin_id, day, month, year) {
+    async reserveTable(
+      pending_id,
+      restaurant_id,
+      user_id,
+      table_id,
+      termin_id,
+      day,
+      month,
+      year
+    ) {
+      try {
+        let res = await Service.post("/make/reservation", {
+          restaurant_id: restaurant_id,
+          user_id: user_id,
+          table_id: table_id,
+          termin_id: termin_id,
+          day: day,
+          month: month,
+          year: year,
+        });
 
-        try {
-          let res = await Service.post("/make/reservation", {
-            restaurant_id: restaurant_id,
-            user_id: user_id,
-            table_id: table_id,
-            termin_id: termin_id,
-            day: day,
-            month: month,
-            year: year,
-          });
+        let del = await Service.delete("/delete/pending", {
+          params: {
+            id: pending_id,
+          },
+        });
 
-          let del = await Service.delete("/delete/pending", {
-            params: {
-              id: pending_id
-            }
-          })
+        if (del && res) {
+          const indexToRemove = this.pending.findIndex(
+            (element) => element.pending_id === pending_id
+          );
 
-          if(del && res) {
-            const indexToRemove = this.pending.findIndex(element => element.pending_id === pending_id);
-
-            if (indexToRemove !== -1) {
-              const removedElement = this.pending.splice(indexToRemove, 1)[0]; // remove the element and store it in a variable
-              console.log(`Removed element with ID ${removedElement.id}.`);
-            } else {
-              console.log(`No element found with ID.`);
-            }
-          }else console.log("nije uspijelo")
-          console.log("napravi rezervaciju res: ", res);
-          console.log("daj delete rezervacije res: ", del);
-        } catch (error) {
-          console.log(error);
-        }
+          if (indexToRemove !== -1) {
+            const removedElement = this.pending.splice(indexToRemove, 1)[0]; // remove the element and store it in a variable
+            console.log(`Removed element with ID ${pending_id}.`);
+          } else {
+            console.log(`No element found with ID.`);
+          }
+        } else console.log("nije uspijelo");
+        console.log("napravi rezervaciju res: ", res);
+        console.log("daj delete rezervacije res: ", del);
+      } catch (error) {
+        console.log(error);
+      }
 
       //this.$router.go()
     },
 
+    async rejectReservation(pending_id) {
+      try {
+        let res = await Service.delete("/delete/pending", {
+          params: {
+            id: pending_id,
+          },
+        });
+        if (res) {
+          const indexToRemove = this.pending.findIndex(
+            (element) => element.pending_id === pending_id
+          );
+
+          if (indexToRemove !== -1) {
+            const removedElement = this.pending.splice(indexToRemove, 1)[0]; // remove the element and store it in a variable
+            console.log(`Removed element with ID ${pending_id}.`);
+          } else {
+            console.log(`No element found with ID.`);
+          }
+        } else console.log("nije uspijelo");
+      } catch (error) {}
+    },
   },
   mounted() {
-    this.getPending()
+    this.getPending();
   },
 };
 </script>
@@ -124,23 +179,23 @@ export default {
   font-size: 40px;
 }
 .content {
-    margin-top: 100px;
+  margin-top: 100px;
 }
 .item {
-    display: flex;
-    margin-bottom: 10px !important;
-    justify-content: space-evenly;
-    background-color: #333333;
-    height: 50px;
-    width: 100%;
-    margin: auto;
-    border-radius: 25px;
-    font-size: 20px;
+  display: flex;
+  margin-bottom: 10px !important;
+  justify-content: space-evenly;
+  background-color: #333333;
+  height: 50px;
+  width: 100%;
+  margin: auto;
+  border-radius: 25px;
+  font-size: 20px;
 }
 .vertical-align {
-    align-self: center;
+  align-self: center;
 }
 .btn {
-    cursor: pointer;
+  cursor: pointer;
 }
 </style>
