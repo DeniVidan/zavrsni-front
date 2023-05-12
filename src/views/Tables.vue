@@ -19,6 +19,10 @@
         <get-termin />
       </div>
 
+      <div class="description">
+        <add-description />
+      </div>
+
     </div>
   </div>
 </template>
@@ -29,6 +33,7 @@ import AddTable from "../components/AddTable.vue";
 import AddTermin from "../components/AddTermin.vue";
 import GetTable from "../components/GetTable.vue";
 import GetTermin from "../components/GetTermin.vue";
+import AddDescription from "../components/AddDescription.vue";
 
 export default {
   name: "Tables",
@@ -43,7 +48,8 @@ export default {
     AddTable,
     AddTermin,
     GetTable,
-    GetTermin
+    GetTermin,
+    AddDescription
   },
   methods: {
     async getRestaurantTables() {
@@ -87,6 +93,7 @@ export default {
     justify-content: flex-start;
     
   margin-top: 60px;
+  margin-bottom: 100px;
 }
 .add-table, .add-termin {
   margin-right: 30px;
@@ -96,5 +103,8 @@ export default {
 }
 .get-table {
   margin-right: 30px !important;
+}
+.text-area {
+  background-color: white;
 }
 </style>

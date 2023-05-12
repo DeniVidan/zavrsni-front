@@ -47,9 +47,9 @@
       </div>
       <div class="error">{{ error }}</div>
       <div class="edit-card">
-        <div class="item-title" @click="toggle()">Edit profile</div>
+        <div class="item-title" @click="clicked">Edit profile</div>
         <div class="slide-conteiner">
-          <div class="login-form" v-show="isToggle">
+          <div id="card-body" class="login-form hidden">
             <label for="">First name</label>
             <input
               v-model="firstname"
@@ -84,6 +84,30 @@
           </div>
         </div>
       </div>
+
+      <div class="edit-card">
+        <div class="item-title" @click="clicked">Your Reservations</div>
+        <div class="slide-conteiner">
+          <div id="card-body" class="hidden">
+            <div class="card-info" v-for="r in currentReservations" :key="r">
+              <div class="item">
+                <div class="align">
+                  <b>{{ r.restaurant_name }}</b>
+                </div>
+                <div class="align">
+                  <b>{{ `${r.month}/${r.day}/${r.year}` }}</b>
+                </div>
+                <div class="align">
+                  <b>{{ r.start_time + " - " + r.end_time }}</b>
+                </div>
+                <div>
+                  <v-btn @click="cancelReservation(r.reservation_id)" class="btn">cancel</v-btn>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -91,6 +115,8 @@
 <script>
 import { Auth, Service } from "../services/services";
 import imageCompression from "browser-image-compression";
+import checkmark from "../assets/checkmark.png";
+import xsquare from "../assets/xsquare.png";
 
 export default {
   name: "Profile",
@@ -110,9 +136,23 @@ export default {
       changePass: false,
       base64compressed: null,
       currentImage: null,
+      reservations: [],
+      currentReservations: [],
+      checkmark: checkmark,
+      xsquare: xsquare,
     };
   },
   methods: {
+    clicked(event) {
+      const groupElement = event.target.closest(".edit-card");
+      const tableBodyElement = groupElement.querySelector("#card-body");
+
+      if (!tableBodyElement.classList.contains("hidden")) {
+        tableBodyElement.classList.add("hidden");
+      } else {
+        tableBodyElement.classList.remove("hidden");
+      }
+    },
     goBack() {
       this.$router.go(-1);
     },
@@ -121,6 +161,54 @@ export default {
       this.isToggle = !this.isToggle;
     },
 
+    async getUserReservations() {
+      try {
+        let res = await Service.get("/get/user/reservations", {
+          params: {
+            id: this.id,
+          },
+        });
+        this.reservations = res.data.result;
+
+        const today = new Date();
+
+        const formattedDate = today.toLocaleDateString("en-US");
+        this.reservations.forEach((item) => {
+          const temp = new Date(`${item.month}/${item.day}/${item.year}`);
+          const eventDate = temp.toLocaleDateString("en-US");
+          console.log(eventDate, " ", formattedDate);
+          if (eventDate <= formattedDate) {
+            this.currentReservations.push(item);
+          }
+        });
+        console.log("users reservations: ", res);
+      } catch (error) {}
+    },
+    async cancelReservation(reservation_id) {
+      try {
+        let res = await Service.delete("/delete/reservation", {
+          params: {
+            reservation_id: reservation_id
+          }
+        })
+
+        if (res) {
+          const indexToRemove = this.currentReservations.findIndex(
+            (element) => element.reservation_id === reservation_id
+          );
+
+          if (indexToRemove !== -1) {
+            const removedElement = this.currentReservations.splice(indexToRemove, 1)[0]; // remove the element and store it in a variable
+            console.log(`Removed element with ID ${reservation_id}.`);
+          } else {
+            console.log(`No element found with ID.`);
+          }
+        } else console.log("nije uspijelo");
+        console.log("delete reservation: ", res)
+      } catch (error) {
+        console.log(error)
+      }
+    },
     async editUserInfo() {
       try {
         if (this.password == "" && this.newPassword == "") {
@@ -235,6 +323,7 @@ export default {
   },
   mounted() {
     this.getImage();
+    this.getUserReservations();
   },
 };
 </script>
@@ -376,5 +465,26 @@ export default {
   font-weight: bold;
   color: white;
   border-radius: 10px;
+}
+.hidden {
+  display: none;
+}
+.card-info {
+  color: white;
+}
+.item {
+  display: flex;
+  justify-content: space-around;
+  font-size: 20px;
+  padding: 10px;
+}
+.btn {
+  cursor: pointer;
+  background-color: rgb(255, 97, 97);
+  color: white;
+  font-weight: bold;
+}
+.align {
+  align-self: center;
 }
 </style>

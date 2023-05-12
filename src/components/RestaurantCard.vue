@@ -1,7 +1,7 @@
 <template>
   <div class="card" v-for="r in filteredRestaurants" :key="r.id">
     <div class="image">
-      <img src="https://picsum.photos/250/250" alt="" />
+      <img :src="r.image" alt="" width="250" height="250"/>
     </div>
     <div class="content">
       <div class="title">
@@ -24,9 +24,7 @@
         
       </div>
       <div class="text">
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Provident
-        corrupti sunt laboriosam, eaque laborum quod eos. Sit reprehenderit rem
-        pariatur.
+        {{r.description}}
       </div>
       <div class="interactive">
         <router-link
@@ -120,7 +118,7 @@ export default {
   flex-direction: row;
   margin-bottom: 20px;
   background: #333333;
-  height: 250px;
+  min-height: 250px;
   max-width: 800px;
   border-radius: 15px;
 }

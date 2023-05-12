@@ -2,11 +2,13 @@ import axios from "axios";
 
 let ServiceAuth = axios.create({
   baseURL: "http://localhost:3030/api",
+  //baseURL: "https://zavrsni-back-production.up.railway.app",
   timeout: 10000,
 });
 
 let Service = axios.create({
   baseURL: "http://localhost:3030/api",
+  //baseURL: "https://zavrsni-back-production.up.railway.app",
   timeout: 10000,
 });
 
