@@ -30,7 +30,11 @@
                 p.termin_id,
                 p.day,
                 p.month,
-                p.year
+                p.year,
+                p.email,
+                p.start_time,
+                p.end_time,
+                p.firstname
               )
             "
             class="btn"
@@ -53,6 +57,9 @@
 import { Auth, Service } from "../services/services";
 import checkmark from "../assets/checkmark.png";
 import xsquare from "../assets/xsquare.png";
+
+
+
 
 export default {
   name: "Pending",
@@ -96,7 +103,11 @@ export default {
       termin_id,
       day,
       month,
-      year
+      year,
+      email,
+      start_time,
+      end_time,
+      firstname
     ) {
       try {
         let res = await Service.post("/make/reservation", {
@@ -107,6 +118,10 @@ export default {
           day: day,
           month: month,
           year: year,
+          email: email,
+          start_time: start_time,
+          end_time: end_time,
+          firstname: firstname
         });
 
         let del = await Service.delete("/delete/pending", {
@@ -126,6 +141,8 @@ export default {
           } else {
             console.log(`No element found with ID.`);
           }
+
+
         } else console.log("nije uspijelo");
         console.log("napravi rezervaciju res: ", res);
         console.log("daj delete rezervacije res: ", del);

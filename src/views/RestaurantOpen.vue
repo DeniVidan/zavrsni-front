@@ -114,7 +114,7 @@
                 v-for="(reservation, k, l) in reservations"
                 :key="reservation"
               >
-                <div class="one-table" v-if="checkReservation(reservation)">
+                <div class="one-table" v-if="reservation[l]">
                   <!-- {{reservation[l].reservation_id}} -->
                   <p style="align-self: center; width: 70px">
                     SIZE: {{ reservation[l].table_size }}
@@ -412,22 +412,7 @@ export default {
       this.$router.go()
     },
 
-    checkReservation(reservation) {
-      let br = 0;
-      reservation.forEach((element) => {
-        if (element.reservation_id == null) {
-          this.test = true;
-        } else {
-          this.test = false;
-          br++;
-        }
-      });
-      if (br == this.termins.length) {
-        return false;
-      } else {
-        return true;
-      }
-    },
+
     changeColor(event) {
       const elements = document.querySelectorAll(".termin-item");
       elements.forEach((element) => {
