@@ -15,7 +15,7 @@
     </div>
 
     <div class="login-form">
-      <div class="error"></div>
+      <div class="error">{{ error }}</div>
 
       <label for="">Verification code</label>
       <input
@@ -27,9 +27,7 @@
       <br />
       <br />
       <div class="login-btn">
-        <router-link to="#"
-          ><div class="button">Verify</div></router-link
-        >
+        <div @click="verify()" class="button">Verify</div>
       </div>
     </div>
 
@@ -42,7 +40,7 @@
 <script>
 // @ is an alias to /src
 import axios from "axios";
-import { Auth } from "../services/services";
+import { Auth, Service } from "../services/services";
 
 export default {
   name: "Verify",
@@ -50,11 +48,53 @@ export default {
   data() {
     return {
       code: "",
-      auth: Auth
+      error: "",
+      auth: Auth,
+      currentUser: Auth.getUser()
     }
   },
 
-  methods: {},
+  methods: {
+    async verify () {
+      try {
+        console.log("current user id: ", this.currentUser)
+        let res = await Service.post("/verify/code", {
+          email: this.currentUser.email,
+          input_code: this.code
+        })
+        
+        console.log("res za verify: ", res)
+
+        if(res.data.result.status == 200) {
+          const userLocalStorage = JSON.parse(localStorage.getItem('user'))
+          userLocalStorage.verified = 1
+          console.log("changed localstorage: ", userLocalStorage)
+          localStorage.setItem('user', JSON.stringify(userLocalStorage));
+          this.$router.go()
+
+        try {
+          console.log("email verify delete: ", this.currentUser.email)
+          let del = await Service.delete("/delete/verify/code", {
+          params:{
+            email: this.currentUser.email
+          }
+        })
+
+        console.log("daj mi delete verify code res: ", del)
+        } catch (error) {
+          console.log(error)
+        }
+        
+
+        } else {
+          this.error = "Wrong verification code"
+          console.log("krivi code")
+        }
+      } catch (error) {
+        
+      }
+    }
+  },
 
   mounted() {},
 };
@@ -132,6 +172,8 @@ h2 > b {
   font-size: 24px;
   border-radius: 18px;
   font-weight: bold;
+  text-align: center;
+  cursor: pointer;
 }
 .footer {
   color: rgba(255, 255, 255, 0.342);
@@ -142,5 +184,13 @@ a {
   text-decoration: none !important;
   color: white;
   align-self: center;
+}
+.error{
+  color: white;
+  background-color: rgb(255, 67, 67);
+  padding: 0px 0px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 19px;
 }
 </style>

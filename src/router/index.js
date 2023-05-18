@@ -14,7 +14,7 @@ import RestaurantOpen from "../views/RestaurantOpen.vue";
 import Pending from "../views/Pending.vue";
 
 import { returnStatement } from "@babel/types";
-import { penFancy } from "fontawesome";
+import { penFancy, user } from "fontawesome";
 
 /* eslint-disable */
 const routes = [
@@ -95,10 +95,46 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const publicSite = ["/getstarted", "/login", "/register", "/register/admin", "/choose" ];
+  const publicSite = ["/getstarted", "/login", "/register", "/register/admin", "/choose"];
+  const adminSite = ["/schedule", "/tables", "/pending"];
+  const userSite = ["/", "/restaurant", "/verify"];
+  const userRole = Auth.getUserRole();
+  const userActivated = Auth.getUser().verified;
+  console.log("verified: ", userActivated);
+  console.log("user role: ", userRole)
+  let isAuthenticated = Auth.authenticated();
+  const loginRequired = !publicSite.includes(to.path);
+  const adminPath = adminSite.includes(to.path);
+  const userPath = userSite.includes(to.path);
+
+  if (!isAuthenticated && loginRequired) {
+    next("/login");
+  } else if (userActivated === 0 && to.path !== "/verify") {
+    next("/verify");
+  } else if (userActivated === 1 && to.path === "/verify") {
+    next("/"); // Redirect to home or other appropriate route
+  } else if (isAuthenticated && !loginRequired && userActivated !== 0) {
+    next("/");
+  } else if (isAuthenticated && userRole !== "admin" && adminPath) {
+    console.log("User access denied to admin site");
+    next("/"); // redirect to user site
+  } else if (isAuthenticated && userRole !== "user" && userPath) {
+    // Only redirect to admin site if the current path is in adminSite and doesn't contain any user-specific routes
+    console.log("Admin access denied to user site");
+    next("/schedule"); // redirect to admin site
+  } else {
+    next();
+  }
+});
+
+/*
+router.beforeEach(async (to, from, next) => {
+  const publicSite = ["/getstarted", "/login", "/register", "/register/admin", "/choose"];
   const adminSite = ["/schedule", "/tables"]
-  const userSite = ["/", "/restaurant"]
+  const userSite = ["/", "/restaurant", "/verify"]
   const userRole = Auth.getUserRole()
+  const userActivated = Auth.getUser().verified
+  console.log("verified: ", userActivated)
   let isAuthenticated = Auth.authenticated()
 
   const loginRequired = !publicSite.includes(to.path);
@@ -108,7 +144,9 @@ router.beforeEach(async (to, from, next) => {
   //console.log(isAuthenticated, userRole, adminPath)
   if (!isAuthenticated && loginRequired) {
     next("/login");
-  } else if (isAuthenticated && !loginRequired){
+  } else if (userActivated == 0) {
+    next("/verify")
+  } else if (isAuthenticated && !loginRequired && userActivated != 0){
     next("/")
   } else if (isAuthenticated && userRole == "user" && adminPath) {
     console.log("User access denied to admin site")
@@ -120,5 +158,5 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 });
-
+ */
 export default router;

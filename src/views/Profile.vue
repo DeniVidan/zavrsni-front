@@ -101,7 +101,11 @@
                   <b>{{ r.start_time + " - " + r.end_time }}</b>
                 </div>
                 <div>
-                  <v-btn @click="cancelReservation(r.reservation_id)" class="btn">cancel</v-btn>
+                  <v-btn
+                    @click="cancelReservation(r.reservation_id)"
+                    class="btn"
+                    >cancel</v-btn
+                  >
                 </div>
               </div>
             </div>
@@ -169,28 +173,28 @@ export default {
           },
         });
         this.reservations = res.data.result;
+        console.log("users reservations: ", res);
 
-        const today = new Date();
+        const today = new Date(); // Get the current date
+        today.setHours(0, 0, 0, 0); // Set the time to 00:00:00:00
 
-        const formattedDate = today.toLocaleDateString("en-US");
         this.reservations.forEach((item) => {
-          const temp = new Date(`${item.month}/${item.day}/${item.year}`);
-          const eventDate = temp.toLocaleDateString("en-US");
-          console.log(eventDate, " ", formattedDate);
-          if (eventDate <= formattedDate) {
+          const eventDate = new Date(item.year, item.month - 1, item.day); // Note: month is zero-based
+
+          if (eventDate >= today) {
             this.currentReservations.push(item);
+            console.log(eventDate, " > ", today);
           }
         });
-        console.log("users reservations: ", res);
       } catch (error) {}
     },
     async cancelReservation(reservation_id) {
       try {
         let res = await Service.delete("/delete/reservation", {
           params: {
-            reservation_id: reservation_id
-          }
-        })
+            reservation_id: reservation_id,
+          },
+        });
 
         if (res) {
           const indexToRemove = this.currentReservations.findIndex(
@@ -198,15 +202,18 @@ export default {
           );
 
           if (indexToRemove !== -1) {
-            const removedElement = this.currentReservations.splice(indexToRemove, 1)[0]; // remove the element and store it in a variable
+            const removedElement = this.currentReservations.splice(
+              indexToRemove,
+              1
+            )[0]; // remove the element and store it in a variable
             console.log(`Removed element with ID ${reservation_id}.`);
           } else {
             console.log(`No element found with ID.`);
           }
         } else console.log("nije uspijelo");
-        console.log("delete reservation: ", res)
+        console.log("delete reservation: ", res);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async editUserInfo() {
@@ -314,7 +321,9 @@ export default {
           user_id: this.currentUser.id,
           image: this.base64compressed,
         });
-
+      if (res.status == 200) {
+        this.$router.go();
+      }
         //console.log("change image res: ", res);
       } catch (error) {
         console.log(error);

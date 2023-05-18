@@ -161,7 +161,7 @@ export default {
       
       else {
         console.log("User registered successfully");
-        this.$router.go();
+        this.$router.push({path: "/verify"})
       }
       this.password = "";
       this.passwordRepeat = "";

@@ -12,10 +12,11 @@
           <b>CONFIRM / DECLINE</b>
         </div>
       </div>
-      <div v-if="pending.length == 0">
+      <div v-if="!pending">
         <h1>No reservations !</h1>
       </div>
-      <div class="item" v-for="p in pending" :key="p" style="padding: 0px 40px">
+      <div v-if="pending">
+              <div class="item" v-for="p in pending" :key="p" style="padding: 0px 40px">
         <div class="vertical-align">{{ p.table_name }}</div>
         <div class="vertical-align">{{ p.start_time + "-" + p.end_time }}</div>
         <div class="vertical-align">{{ p.firstname + " " + p.lastname }}</div>
@@ -49,6 +50,8 @@
           />
         </div>
       </div>
+      </div>
+
     </div>
   </div>
 </template>

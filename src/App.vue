@@ -6,7 +6,7 @@
     >
       <div class="profile">
         <router-link to="/profile"
-          ><img :src="currentImage" width="50" height="50"
+          ><img style="object-fit: cover;" :src="currentImage" width="50" height="50"
         /></router-link>
         <div style="color: white; font-size: 13px">{{ getUserEmail }}</div>
       </div>

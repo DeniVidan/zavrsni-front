@@ -1,7 +1,7 @@
 <template>
   <div class="card" v-for="r in filteredRestaurants" :key="r.id">
     <div class="image">
-      <img :src="r.image" alt="" width="250" height="250"/>
+      <img style="object-fit: cover;" :src="r.image" alt="" width="250" height="250"/>
     </div>
     <div class="content">
       <div class="title">
