@@ -241,14 +241,14 @@ export default {
           },
         });
 
-        console.log("daj mi restauran tablesyxx: ", res.data);
+        console.log("daj mi restauran tables: ", res.data);
         this.tables = res.data.result;
         this.groupedTables = this.groupTablesBySize(this.tables);
         this.groupedReservations = this.groupTablesBySizeAndName(
           this.reservations
         );
 
-        console.log("ta stvar: ", this.groupedReservations);
+        //console.log("ta stvar: ", this.groupedReservations);
       } catch (error) {
         console.log("error za restoran tables: ", error);
       }
@@ -407,7 +407,7 @@ export default {
           console.log(error.response);
         }
       } else {
-        console.log("choose termin idiot");
+        console.log("Please choose termin");
       }
       this.$router.go()
     },
@@ -441,8 +441,6 @@ export default {
   mounted() {
     console.log("id od restorana: ", this.$route.params.id);
     this.getRestaurant();
-
-    /*     this.setFilter() */
   },
 };
 </script>

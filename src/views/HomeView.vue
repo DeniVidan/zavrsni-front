@@ -127,10 +127,8 @@ export default {
 
 
   mounted() {
-    //this.getUsers();
     this.getRestaurants();
     this.isUser();
-    console.log("localstorage: ", Auth.getUser().email);
   },
 };
 </script>

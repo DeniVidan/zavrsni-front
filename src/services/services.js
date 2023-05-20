@@ -171,7 +171,7 @@ let Auth = {
         console.log("daj mi res: ", res);
         if (res.status == 200) {
           const user = res.data.result;
-          console.log("userxxx: ", user);
+          console.log("user: ", user);
           localStorage.setItem("user", JSON.stringify(user));
         }
         return {
@@ -212,19 +212,14 @@ let Auth = {
     return token;
   },
   getUserEmail() {
-    //console.log("đuzer: ", Auth.getUser())
-
     if (Auth.getUser().email != null) {
-      //console.log("ima email: ", Auth.getUser().email)
       return Auth.getUser().email;
     } else if (Auth.getUser().email == null) {
-      //console.log("nema email: ", Auth.getUser().email)
       return "nema usera";
     }
   },
   getUserRole() {
     let res = Auth.getUser().role;
-    //console.log("rola: ", res)
     if (res == null) {
       return "nema usera";
     } else return res;

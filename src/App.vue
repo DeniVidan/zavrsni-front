@@ -73,7 +73,7 @@ export default {
             user_id: this.currentUser.id,
           },
         });
-        //console.log("get image res: ", res.data.result[0].image);
+        
 
         this.currentImage = res.data.result[0].image;
       } catch (error) {
@@ -102,9 +102,6 @@ export default {
       } else return true;
     },
 
-    sendSearch() {
-      return this.searchItem;
-    },
   },
   mounted() {
     this.isUser();

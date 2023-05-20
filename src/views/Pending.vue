@@ -147,8 +147,8 @@ export default {
 
 
         } else console.log("nije uspijelo");
-        console.log("napravi rezervaciju res: ", res);
-        console.log("daj delete rezervacije res: ", del);
+        //console.log("napravi rezervaciju res: ", res);
+        //console.log("daj delete rezervacije res: ", del);
       } catch (error) {
         console.log(error);
       }

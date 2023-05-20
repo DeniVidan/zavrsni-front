@@ -19,22 +19,6 @@
         <input @change="setDay()" class="date-picker" type="date" v-model="picker">
       </div>
      
-<!--         <v-text-field
-          v-model="picker"
-          label="Start date"
-          type="date"
-          @change="display(picker)"
-        ></v-text-field>
-      -->
-
-
-
-<!--       <div class="choose-date">
-        <div @click="previous()" class="previous"> {{"<"}} </div>
-        <div class="chosen-date">{{ date }}</div>
-        <div @click="next()" class="next"> > </div>
-      </div>
- -->
       <div style="">
       <div class="wraper" v-for="(i, group) in groupedTables" :key="i">
         <table class="">
@@ -132,7 +116,7 @@ export default {
           this.tableNumber = true;
         } else this.tableNumber = false;
 
-        console.log("daj mi restauran tablesyxx: ", res.data.result);
+        console.log("daj mi restauran tables: ", res.data.result);
         this.tables = res.data.result;
         this.groupedTables = this.groupTablesBySize(this.tables);
         this.termins = this.getTermins(this.tables);
@@ -193,38 +177,14 @@ export default {
       this.getReservations();
      }
 
-/*       getDate() {
-      console.log("current date: ", this.date);
-    },
-    next() {
-      let temp = this.date.split("/")
-
-      console.log("temp: ", temp[0])
-    },
-
-    previous() {
-
-    } */
-
 
   },
-/*   computed: {
-    filteredTables() {
-      return (group) => {
-        return this.tables.filter((table) => {
-          console.log(" ", table.table_size);
-          return table.table_size === group;
-        });
-      };
-    },
-  }, */
+
   mounted() {
     this.getRestaurantTables();
     this.getRestaurantTermins();
     this.setDay()
     
-/*     this.getDate() */
-/* console.log("dan: ", this.day, this.month, this.year) */
   },
 };
 </script>

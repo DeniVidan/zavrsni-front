@@ -99,15 +99,10 @@ export default {
       
     },
     
-    test() {
-      console.log("testiramo===========!")
-    }
+
   },
   mounted() {
-    this.filteredRestaurants.forEach(element => {
-      console.log("cigan: ", element)
-    });
-    console.log(this.currentUser)
+
   },
 };
 </script>

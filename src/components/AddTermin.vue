@@ -1,29 +1,31 @@
 <template>
-  <div id="error" class="error">{{ error }}</div>
-  <div class="termin">
-    <div class="card-title">Add termin</div>
-    <div class="card-lr">
-      <div class="left">START</div>
-      <div class="right">END</div>
-    </div>
-    <div v-for="(input, index) in inputs" :key="index">
-      <input
-        type="time"
-        :value="input.value1"
-        @input="updateInput(index, 'value1', $event.target.value)"
-        placeholder="Start termin"
-      />
-      <input
-        type="time"
-        :value="input.value2"
-        @input="updateInput(index, 'value2', $event.target.value)"
-        placeholder="End termin"
-      />
-    </div>
+  <div>
+    <div id="error" class="error">{{ error }}</div>
+    <div class="termin">
+      <div class="card-title">Add termin</div>
+      <div class="card-lr">
+        <div class="left">START</div>
+        <div class="right">END</div>
+      </div>
+      <div v-for="(input, index) in inputs" :key="index">
+        <input
+          type="time"
+          :value="input.value1"
+          @input="updateInput(index, 'value1', $event.target.value)"
+          placeholder="Start termin"
+        />
+        <input
+          type="time"
+          :value="input.value2"
+          @input="updateInput(index, 'value2', $event.target.value)"
+          placeholder="End termin"
+        />
+      </div>
 
-    <div class="button">
-      <div @click="addInput" class="button-left">ADD TERMIN</div>
-      <div @click="createTermin()" class="button-right">CREATE</div>
+      <div class="button">
+        <div @click="addInput" class="button-left">ADD TERMIN</div>
+        <div @click="createTermin()" class="button-right">CREATE</div>
+      </div>
     </div>
   </div>
 </template>

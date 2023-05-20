@@ -183,7 +183,7 @@ export default {
 
           if (eventDate >= today) {
             this.currentReservations.push(item);
-            console.log(eventDate, " > ", today);
+            //console.log(eventDate, " > ", today);
           }
         });
       } catch (error) {}
