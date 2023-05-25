@@ -235,27 +235,29 @@ export default {
             password: this.password,
             newPassword: this.newPassword,
             token: this.token,
-            id: this.id,
           });
 
           console.log("change user res: ", res);
+          if (res) {
+            if (res.status == 200) {
+              let user = {
+                token: this.token,
+                firstname: this.firstname,
+                lastname: this.lastname,
+                email: this.email,
+                role: this.role,
+                id: this.id,
+              };
+              console.log("new user: ", user);
+              localStorage.setItem("user", JSON.stringify(user));
 
-          if (res.status == 200) {
-            let user = {
-              token: this.token,
-              firstname: this.firstname,
-              lastname: this.lastname,
-              email: this.email,
-              role: this.role,
-              id: this.id,
-            };
-
-            localStorage.setItem("user", JSON.stringify(user));
-
-            this.$router.go();
+              //this.$router.go();
+            } else {
+              this.error = "Old password doesnt match";
+            }
+          } else {
+            this.error = "Something went wrong!"
           }
-        } else {
-          this.error = "Please change any fields";
         }
       } catch (error) {
         this.error = "Please change any fields";
@@ -321,9 +323,9 @@ export default {
           user_id: this.currentUser.id,
           image: this.base64compressed,
         });
-      if (res.status == 200) {
-        this.$router.go();
-      }
+        if (res.status == 200) {
+          this.$router.go();
+        }
         //console.log("change image res: ", res);
       } catch (error) {
         console.log(error);

@@ -97,7 +97,7 @@ export default {
       } else return true;
     },
     isRestaurantPath() {
-      if (this.$route.name == "restaurantopen") {
+      if (this.$route.name == "restaurantopen" || this.$route.name == "restaurantdetail") {
         return false;
       } else return true;
     },

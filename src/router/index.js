@@ -12,6 +12,7 @@ import Tables from "../views/Tables.vue";
 import Profile from "../views/Profile.vue";
 import RestaurantOpen from "../views/RestaurantOpen.vue";
 import Pending from "../views/Pending.vue";
+import RestaurantDetail from "../views/RestaurantDetail.vue";
 
 import { returnStatement } from "@babel/types";
 import { penFancy, user } from "fontawesome";
@@ -86,6 +87,11 @@ const routes = [
     path: "/pending",
     name: "pending",
     component: Pending,
+  },
+  {
+    path: "/restaurant/info/:id",
+    name: "restaurantdetail",
+    component: RestaurantDetail,
   },
 ];
 

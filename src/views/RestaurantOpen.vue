@@ -237,7 +237,7 @@ export default {
         let res = await Service.get("/restaurant/tables", {
           params: {
             email: this.email,
-            id: this.restaurants.id,
+            id: this.restaurants.restaurant_id,
           },
         });
 
@@ -259,7 +259,7 @@ export default {
         let res = await Service.get("/restaurant/termins", {
           params: {
             email: this.email,
-            id: this.restaurants.id,
+            id: this.restaurants.restaurant_id,
           },
         });
 
@@ -288,7 +288,7 @@ export default {
         let res = await Service.get("/restaurant/reservations", {
           params: {
             email: this.email,
-            id: this.restaurants.id,
+            id: this.restaurants.restaurant_id,
             day: this.day,
             month: this.month,
             year: this.year,
