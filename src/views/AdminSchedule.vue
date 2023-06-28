@@ -14,43 +14,88 @@
     </div>
 
     <div class="content">
-      
       <div class="choose-date">
-        <input @change="setDay()" class="date-picker" type="date" v-model="picker">
+        <input
+          @change="setDay()"
+          class="date-picker"
+          type="date"
+          v-model="picker"
+        />
+        <v-btn
+          style="margin-left: 80px; font-size: 20px; font-weight: bold"
+          color="#1e90ff"
+          :to="{ name: 'restaurantopen', params: { id: currentUser.id } }"
+          >book</v-btn
+        >
       </div>
-     
+
       <div style="">
-      <div class="wraper" v-for="(i, group) in groupedTables" :key="i">
-        <table class="">
-          <div style="font-size: 26px; font-weight: bold">
-            {{ group }}<img style="padding-left: 7px" :src="chairImg" alt="" />
-          </div>
-          <tr>
-            <th></th>
-            <th
-              style="padding-left: 30px;"
-              v-for="(termin, index) in termins"
-              :key="index"
-            >
-              {{ termin.start_time }} - {{ termin.end_time }}
-            </th>
-          </tr>
-          
-          <tr v-for="(table, index) in tables" :key="index">
-            <div style="font-size: 20px" v-if="table.table_size == group">{{ table.table_name }}</div>
-            <td style="margin: 20px; background: #464646;" v-for="(termin, index) in termins" :key="index">
-              <div class="table-box" v-for="reservation in reservations" :key="reservation">
-                <div class="reservation" v-if="table.id == reservation.table_id && termin.id == reservation.termin_id && table.table_size == group">
-                  <div >
-                    <div v-if="reservation.firstname"> {{reservation.firstname + ' ' + reservation.lastname}}</div>    
+        <div class="wraper" v-for="(i, group) in groupedTables" :key="i">
+          <table class="">
+            <div style="font-size: 26px; font-weight: bold">
+              {{ group
+              }}<img style="padding-left: 7px" :src="chairImg" alt="" />
+            </div>
+            <tr>
+              <th></th>
+              <th
+                style="padding-left: 30px"
+                v-for="(termin, index) in termins"
+                :key="index"
+              >
+
+
+                {{ termin.start_time }} - {{ termin.end_time }}
+              </th>
+            </tr>
+
+            <tr v-for="(table, index) in tables" :key="index">
+              <div style="font-size: 20px" v-if="table.table_size == group">
+                {{ table.table_name }}
+              </div>
+              <td
+                @click="proba(termin) && proba2"
+                style="margin: 20px; background: #464646"
+                v-for="(termin, index) in termins"
+                :key="index"
+              >
+
+
+              <div v-if="reservations">
+                <div
+                  class="table-box"
+                  v-for="reservation in reservations"
+                  :key="reservation"
+                >
+                  <div
+                    class="reservation"
+                    v-if="
+                      table.id == reservation.table_id &&
+                      termin.id == reservation.termin_id &&
+                      table.table_size == group
+                    "
+                  >
+                    <div>
+                      <div v-if="reservation.firstname">
+                        {{ reservation.name }}
+                        <img
+                          @click="cancelReservation(reservation.reservation_id)"
+                          style="cursor: pointer"
+                          :src="xsquare"
+                          alt=""
+                          width="20"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </td>
-          </tr>
 
-        </table>
-      </div>
+
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -58,7 +103,7 @@
 <script>
 import { Auth, Service } from "../services/services";
 import chairImg from "../assets/chair.png";
-
+import xsquare from "../assets/xsquare.png";
 
 export default {
   name: "AdminSchedule",
@@ -69,17 +114,28 @@ export default {
       tableNumber: false,
       chairImg: chairImg,
       tables: [],
+      xsquare: xsquare,
       reservations: [],
       groupedTables: {},
       termins: [],
-      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      day: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[2],
-      month: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[1],
-      year: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[0],
+      picker: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10),
+      day: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10)
+        .split("-")[2],
+      month: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10)
+        .split("-")[1],
+      year: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10)
+        .split("-")[0],
     };
   },
   methods: {
-
     async getReservations() {
       try {
         let res = await Service.get("/reservations", {
@@ -120,7 +176,6 @@ export default {
         this.tables = res.data.result;
         this.groupedTables = this.groupTablesBySize(this.tables);
         this.termins = this.getTermins(this.tables);
-
       } catch (error) {
         console.log("error za restoran tables: ", error);
       }
@@ -164,27 +219,60 @@ export default {
       }
       return Array.from(termins).sort();
     },
-    display(picker){
-      console.log(picker)
+    display(picker) {
+      console.log(picker);
     },
-     setDay() {
-      let temp = this.picker.split("-")
-      this.day = (this.picker.split("-"))[2]
-      this.month = temp[1]
-      this.year = temp[0]
-      console.log("dan: ", this.day, this.month, this.year)
+    setDay() {
+      let temp = this.picker.split("-");
+      this.day = this.picker.split("-")[2];
+      this.month = temp[1];
+      this.year = temp[0];
+      console.log("dan: ", this.day, this.month, this.year);
 
       this.getReservations();
-     }
+    },
+
+    async cancelReservation(id) {
+      let res = await Service.delete("/delete/existing/reservation", {
+        params: {
+          id: id,
+        },
+      });
+
+      console.log("delete existing reservation: ", res.status);
+
+      if (res.status == 200) {
+          const indexToRemove = this.reservations.findIndex(
+            (element) => element.reservation_id === id
+          );
+
+          if (indexToRemove !== -1) {
+            const removedElement = this.reservations.splice(indexToRemove, 1)[0]; // remove the element and store it in a variable
+            console.log(`Removed element with ID ${id}.`);
+          } else {
+            console.log(`No element found with ID.`);
+          }
 
 
+        } else console.log("nije uspijelo");
+
+    },
+
+    proba(termin) {
+      console.log("termin: ", termin);
+    },
+
+    proba2(event) {
+      console.log(event.target.tagName);
+      /* s */
+    },
   },
 
   mounted() {
     this.getRestaurantTables();
     this.getRestaurantTermins();
-    this.setDay()
-    
+    this.setDay();
+    //console.log("current user: ", this.currentUser.id)
   },
 };
 </script>
@@ -240,17 +328,19 @@ export default {
   min-width: 400px;
   border-radius: 15px;
 }
-table th, td{
+table th,
+td {
   font-size: 20px;
 }
-table { 
-    border-collapse: collapse; 
+table {
+  border-collapse: collapse;
 }
 .choose-date {
   display: flex;
   justify-content: flex-start;
 }
-.next, .previous {
+.next,
+.previous {
   font-weight: bold;
   cursor: pointer;
 }
@@ -261,6 +351,5 @@ table {
   background: #464646;
   padding: 6px 20px 6px 0px;
   border-radius: 10px;
-
 }
 </style>

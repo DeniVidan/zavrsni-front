@@ -12,14 +12,14 @@
           <b>CONFIRM / DECLINE</b>
         </div>
       </div>
-      <div v-if="!pending">
+      <div v-if="pending.length == 0">
         <h1>No reservations !</h1>
       </div>
       <div v-if="pending">
               <div class="item" v-for="p in pending" :key="p" style="padding: 0px 40px">
         <div class="vertical-align">{{ p.table_name }}</div>
         <div class="vertical-align">{{ p.start_time + "-" + p.end_time }}</div>
-        <div class="vertical-align">{{ p.firstname + " " + p.lastname }}</div>
+        <div class="vertical-align">{{ p.name }}</div>
         <div class="vertical-align" style="display: flex">
           <img
             @click="
@@ -35,7 +35,7 @@
                 p.email,
                 p.start_time,
                 p.end_time,
-                p.firstname
+                p.name
               )
             "
             class="btn"
@@ -110,7 +110,7 @@ export default {
       email,
       start_time,
       end_time,
-      firstname
+      name
     ) {
       try {
         let res = await Service.post("/make/reservation", {
@@ -124,7 +124,7 @@ export default {
           email: email,
           start_time: start_time,
           end_time: end_time,
-          firstname: firstname
+          name: name
         });
 
         let del = await Service.delete("/delete/pending", {

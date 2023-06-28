@@ -13,9 +13,28 @@
       <div class="title">
         {{ restaurants.restaurant_name }}, <i>{{ restaurants.location }}</i>
       </div>
-      <div class="choose-date">
-        <input @change="setDay()" class="date-picker" type="date" v-model="picker">
+
+      <div style="display: flex; flex-direction: row">
+        <div class="choose-date">
+          <input
+            @change="setDay()"
+            class="date-picker"
+            type="date"
+            v-model="picker"
+          />
+        </div>
+
+        <div v-if="currentUser.role == 'admin'">
+          <v-text-field
+            v-model="name"
+            :counter="10"
+            label="Enter name"
+            style="width: 250px; margin-left: 30px"
+            required
+          ></v-text-field>
+        </div>
       </div>
+
       <div class="filters">
         <div class="seat-filter">
           <div @click="toggle()" class="seat-title">Seat</div>
@@ -51,9 +70,11 @@
       </div>
 
       <div v-if="termin_id" class="selected-termin">
-        
-        <div  class="termin-item" style="font-weight: bold; background-color: #1e90ff;">
-          {{start_time + '-' + end_time}}
+        <div
+          class="termin-item"
+          style="font-weight: bold; background-color: #1e90ff"
+        >
+          {{ start_time + "-" + end_time }}
         </div>
         <div
           style="
@@ -69,10 +90,29 @@
         >
           <div style="padding: 8px 0px" class="button">Book</div>
         </div>
-        <div @click="removeChosenTermin()" style="cursor: pointer; align-content: center; display: grid; background-color: #ff4444; padding: 0px 10px; border-radius: 10px"> <img :src="closeImg" alt=""> </div>
+        <div
+          @click="removeChosenTermin()"
+          style="
+            cursor: pointer;
+            align-content: center;
+            display: grid;
+            background-color: #ff4444;
+            padding: 0px 10px;
+            border-radius: 10px;
+          "
+        >
+          <img :src="closeImg" alt="" />
+        </div>
       </div>
 
-      <div style="margin-top: 85px; margin-bottom: 20px; display: flex; flex-wrap: wrap">
+      <div
+        style="
+          margin-top: 85px;
+          margin-bottom: 20px;
+          display: flex;
+          flex-wrap: wrap;
+        "
+      >
         <div class="chosen-filter" v-for="filter in filter_data" :key="filter">
           <div class="filter-item" v-for="ff in filter" :key="ff">
             <div style="display: flex" @click="remove(ff)">
@@ -87,7 +127,12 @@
       </div>
 
       <div class="wraper">
-        <div v-if="filter_data.value1.length == 0" style="font-size: 30px; font-weight: bold; color: red;">Please select seat and termin filter</div>
+        <div
+          v-if="filter_data.value1.length == 0"
+          style="font-size: 30px; font-weight: bold; color: red"
+        >
+          Please select seat and termin filter
+        </div>
         <div class="tables">
           <div
             class="group"
@@ -99,63 +144,57 @@
             v-for="(reservations, n) in groupedReservations"
             :key="reservations"
           >
-    	      
             <div v-for="ff in filter_data.value1" :key="ff">
-            <div v-if="n == ff || filter_data.value1.length == 0">
-
-            
-            <div class="size" @click="clicked">
-              {{ n }}
-              <img style="padding-left: 7px" :src="chairImg" alt="" />
-            </div>
-            <div id="card-body" class="hidden">
-              <div
-                class="card"
-                v-for="(reservation, k, l) in reservations"
-                :key="reservation"
-              >
-                <div class="one-table" v-if="reservation[l]">
-                  <!-- {{reservation[l].reservation_id}} -->
-                  <p style="align-self: center; width: 70px">
-                    SIZE: {{ reservation[l].table_size }}
-                  </p>
-                  <div class="termin-wraper">
-                    <div
-                      class="termins"
-                      v-for="(r, br) in reservation"
-                      :key="br"
-                    >
-
-                      <div v-for="f2 in filter_data.value2" :key="f2">
-                      <div
-                        id="termin"
-                        class="termin-item"
-                        v-if="f2 == (r.start_time + '-' + r.end_time)"
-                        @click="changeColor"
-                      >
-                        <b
-                          @click="
-                            chooseTermin(
-                              r.termin_id,
-                              r.tables_id,
-                              r.restaurant_id,
-                              r.start_time,
-                              r.end_time
-                            )
-                          "
-                          >{{ r.start_time + "-" + r.end_time }}</b
+              <div v-if="n == ff || filter_data.value1.length == 0">
+                <div class="size" @click="clicked">
+                  {{ n }}
+                  <img style="padding-left: 7px" :src="chairImg" alt="" />
+                </div>
+                <div id="card-body" class="hidden">
+                  <div
+                    class="card"
+                    v-for="(reservation, k, l) in reservations"
+                    :key="reservation"
+                  >
+                    <div class="one-table" v-if="reservation[l]">
+                      <!-- {{reservation[l].reservation_id}} -->
+                      <p style="align-self: center; width: 70px">
+                        SIZE: {{ reservation[l].table_size }}
+                      </p>
+                      <div class="termin-wraper">
+                        <div
+                          class="termins"
+                          v-for="(r, br) in reservation"
+                          :key="br"
                         >
+                          <div v-for="f2 in filter_data.value2" :key="f2">
+                            <div
+                              id="termin"
+                              class="termin-item"
+                              v-if="f2 == r.start_time + '-' + r.end_time"
+                              @click="changeColor"
+                            >
+                              <b
+                                @click="
+                                  chooseTermin(
+                                    r.termin_id,
+                                    r.tables_id,
+                                    r.restaurant_id,
+                                    r.start_time,
+                                    r.end_time
+                                  )
+                                "
+                                >{{ r.start_time + "-" + r.end_time }}</b
+                              >
+                            </div>
+                          </div>
+                        </div>
                       </div>
-</div>
-
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-</div>
-</div>
-
           </div>
         </div>
       </div>
@@ -177,6 +216,7 @@ export default {
   props: {},
   data() {
     return {
+      name: "",
       currentUser: Auth.getUser(),
       email: Auth.getUserEmail(),
       isToggle: false,
@@ -206,12 +246,24 @@ export default {
       test: true,
       br: 0,
       selected: null,
-      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      day: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[2],
-      month: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[1],
-      year: (((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)).split("-"))[0],
+      picker: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10),
+      day: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10)
+        .split("-")[2],
+      month: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10)
+        .split("-")[1],
+      year: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .substr(0, 10)
+        .split("-")[0],
     };
   },
+
   methods: {
     async getRestaurant() {
       try {
@@ -220,7 +272,7 @@ export default {
             id: this.$route.params.id,
           },
         });
-        console.log("daj mi resturan: ", res.data.result);
+        //console.log("daj mi resturan: ", res.data.result);
         this.restaurants = res.data.result[0];
       } catch (error) {
         console.log("error za restoran: ", error);
@@ -241,7 +293,7 @@ export default {
           },
         });
 
-        console.log("daj mi restauran tables: ", res.data);
+        //console.log("daj mi restauran tables: ", res.data);
         this.tables = res.data.result;
         this.groupedTables = this.groupTablesBySize(this.tables);
         this.groupedReservations = this.groupTablesBySizeAndName(
@@ -264,25 +316,21 @@ export default {
         });
 
         this.termins = res.data.result;
-        console.log("daj mi restauran termins: ", this.termins);
+        //console.log("daj mi restauran termins: ", this.termins);
       } catch (error) {
         console.log("error za restoran termins: ", error);
       }
     },
 
+    setDay() {
+      let temp = this.picker.split("-");
+      this.day = this.picker.split("-")[2];
+      this.month = temp[1];
+      this.year = temp[0];
+      console.log("dan: ", this.day, this.month, this.year);
 
-
-
-
-     setDay() {
-      let temp = this.picker.split("-")
-      this.day = (this.picker.split("-"))[2]
-      this.month = temp[1]
-      this.year = temp[0]
-      console.log("dan: ", this.day, this.month, this.year)
-
-      this.getReservations()
-     },
+      this.getReservations();
+    },
     async getReservations() {
       try {
         let res = await Service.get("/restaurant/reservations", {
@@ -299,7 +347,7 @@ export default {
         this.groupedReservations = this.groupTablesBySizeAndName(
           this.reservations
         );
-        console.log("daj mi restauran reservations: ", this.reservations);
+        //console.log("daj mi restauran reservations: ", this.reservations);
       } catch (error) {
         console.log("error za restoran reservations: ", error);
       }
@@ -380,7 +428,7 @@ export default {
       this.table_id = table_id;
       this.restaurant_id = restaurant_id;
       this.start_time = start_time;
-      this.end_time = end_time
+      this.end_time = end_time;
       console.log("Chosen termin_id: ", this.termin_id);
       console.log("Chosen table_id: ", this.table_id);
       console.log("Chosen restaurant_id: ", this.restaurant_id);
@@ -391,27 +439,50 @@ export default {
     },
     async reserveTable() {
       if (this.termin_id != null) {
-        try {
-          let res = await Service.post("/add/pending", {
-            restaurant_id: this.restaurant_id,
-            user_id: this.currentUser.id,
-            table_id: this.table_id,
-            termin_id: this.termin_id,
-            day: this.day,
-            month: this.month,
-            year: this.year,
-          });
+        if (this.currentUser.role == "user") {
+          try {
+            let res = await Service.post("/add/pending", {
+              restaurant_id: this.restaurant_id,
+              name: this.currentUser.firstname,
+              user_id: this.currentUser.id,
+              table_id: this.table_id,
+              termin_id: this.termin_id,
+              day: this.day,
+              month: this.month,
+              year: this.year,
+            });
 
-          console.log("napravi rezervaciju res: ", res);
-        } catch (error) {
-          console.log(error.response);
+            console.log("napravi rezervaciju res: ", res);
+          } catch (error) {
+            console.log(error.response);
+          }
+        } else {
+          if (this.name != "") {
+            try {
+              let res = await Service.post("/add/pending", {
+                restaurant_id: this.restaurant_id,
+                name: this.name,
+                user_id: this.currentUser.id,
+                table_id: this.table_id,
+                termin_id: this.termin_id,
+                day: this.day,
+                month: this.month,
+                year: this.year,
+              });
+
+              console.log("napravi rezervaciju res: ", res);
+            } catch (error) {
+              console.log(error.response);
+            }
+          } else {
+            console.log("UNESI IME!");
+          }
         }
       } else {
         console.log("Please choose termin");
       }
-      this.$router.go()
+      this.$router.go();
     },
-
 
     changeColor(event) {
       const elements = document.querySelectorAll(".termin-item");
@@ -427,20 +498,18 @@ export default {
       this.table_id = null;
       this.restaurant_id = null;
       this.start_time = "";
-      this.end_time = ""
+      this.end_time = "";
       const elements = document.querySelectorAll(".termin-item");
       elements.forEach((element) => {
         element.classList.remove("active");
       });
     },
-
-
-
   },
 
   mounted() {
-    console.log("id od restorana: ", this.$route.params.id);
+    //console.log("id od restorana: ", this.$route.params.id);
     this.getRestaurant();
+    console.log("user ROLE: ", this.currentUser.role);
   },
 };
 </script>
@@ -618,6 +687,5 @@ i {
   background: #464646;
   padding: 6px 20px 6px 20px;
   border-radius: 10px;
-
 }
 </style>
