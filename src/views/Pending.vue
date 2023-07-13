@@ -5,6 +5,8 @@
     </div>
     <div class="content">
       <div class="item" style="background-color: transparent">
+        <div class="vertical-align"><b>DATE BOOKED</b></div>
+        <div class="vertical-align"><b>TIME BOOKED</b></div>
         <div class="vertical-align"><b>TABLE NAME</b></div>
         <div class="vertical-align"><b>TERMIN</b></div>
         <div class="vertical-align"><b>GUEST</b></div>
@@ -16,42 +18,50 @@
         <h1>No reservations !</h1>
       </div>
       <div v-if="pending">
-              <div class="item" v-for="p in pending" :key="p" style="padding: 0px 40px">
-        <div class="vertical-align">{{ p.table_name }}</div>
-        <div class="vertical-align">{{ p.start_time + "-" + p.end_time }}</div>
-        <div class="vertical-align">{{ p.name }}</div>
-        <div class="vertical-align" style="display: flex">
-          <img
-            @click="
-              reserveTable(
-                p.pending_id,
-                p.restaurant_id,
-                p.user_id,
-                p.table_id,
-                p.termin_id,
-                p.day,
-                p.month,
-                p.year,
-                p.email,
-                p.start_time,
-                p.end_time,
-                p.name
-              )
-            "
-            class="btn"
-            :src="checkmark"
-            alt=""
-          />
-          <img
-            @click="rejectReservation(p.pending_id)"
-            class="btn"
-            :src="xsquare"
-            alt=""
-          />
+        <div
+          class="item"
+          v-for="p in pending"
+          :key="p"
+          style="padding: 0px 40px"
+        >
+          <div class="vertical-align">{{ p.date_time.split("T")[0] }}</div>
+          <div class="vertical-align">{{ ((p.date_time.split("T")[1]).split("Z")[0]).split(":")[0] + " : " + ((p.date_time.split("T")[1]).split("Z")[0]).split(":")[1 ] }}</div>
+          <div class="vertical-align">{{ p.table_name }}</div>
+          <div class="vertical-align">
+            {{ p.start_time + "-" + p.end_time }}
+          </div>
+          <div class="vertical-align">{{ p.name }}</div>
+          <div class="vertical-align" style="display: flex">
+            <img
+              @click="
+                reserveTable(
+                  p.pending_id,
+                  p.restaurant_id,
+                  p.user_id,
+                  p.table_id,
+                  p.termin_id,
+                  p.day,
+                  p.month,
+                  p.year,
+                  p.email,
+                  p.start_time,
+                  p.end_time,
+                  p.name
+                )
+              "
+              class="btn"
+              :src="checkmark"
+              alt=""
+            />
+            <img
+              @click="rejectReservation(p.pending_id)"
+              class="btn"
+              :src="xsquare"
+              alt=""
+            />
+          </div>
         </div>
       </div>
-      </div>
-
     </div>
   </div>
 </template>
@@ -60,9 +70,6 @@
 import { Auth, Service } from "../services/services";
 import checkmark from "../assets/checkmark.png";
 import xsquare from "../assets/xsquare.png";
-
-
-
 
 export default {
   name: "Pending",
@@ -124,7 +131,7 @@ export default {
           email: email,
           start_time: start_time,
           end_time: end_time,
-          name: name
+          name: name,
         });
 
         let del = await Service.delete("/delete/pending", {
@@ -144,8 +151,6 @@ export default {
           } else {
             console.log(`No element found with ID.`);
           }
-
-
         } else console.log("nije uspijelo");
         //console.log("napravi rezervaciju res: ", res);
         //console.log("daj delete rezervacije res: ", del);

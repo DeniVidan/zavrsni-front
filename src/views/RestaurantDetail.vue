@@ -21,7 +21,6 @@
       <!-- <img :src="all_images[0]" /> -->
 
       <v-carousel hide-delimiters v-if="isLoaded">
-
         <v-carousel-item
           cover
           v-for="(image, index) in all_images"
@@ -33,7 +32,12 @@
 
       <div
         class="ml-5 mt-2"
-        style="font-size: 30px; display: flex; justify-content: space-between; color: white"
+        style="
+          font-size: 30px;
+          display: flex;
+          justify-content: space-between;
+          color: white;
+        "
       >
         <div>
           <h1>
@@ -46,6 +50,7 @@
           <v-dialog v-model="dialog" persistent width="1024">
             <template v-slot:activator="{ props }">
               <v-btn
+                v-if="isReviewable"
                 style="
                   align-self: center;
                   font-size: 20px;
@@ -72,13 +77,12 @@
                       <div class="rate">
                         <v-rating
                           id="rating"
-                          v-model="rate"
+                          v-model="new_rate"
                           color="grey"
                           active-color="yellow-accent-4"
                           hover
                           half-increments
                           size="23px"
-                         
                         ></v-rating>
                         <pre>{{ rate }} <span style="font-size: 15px; font-weight: normal;" v-if="!r.avg_rate">NOT RATED YET</span></pre>
                       </div>
@@ -90,7 +94,7 @@
                         variant="filled"
                         label="Write a review"
                         auto-grow
-                        v-model="review"
+                        v-model="new_review"
                       ></v-textarea>
                     </v-col>
                     <v-col cols="12" style="display: flex">
@@ -210,9 +214,52 @@
               </div>
             </div>
           </div>
-
-          <div v-if="review.review" class="review-text">
-            {{ review.review }}
+          <div class="review-text">
+            <div style="width: 90%">
+              <div class="review-content" id="review-content">
+                {{ review.review }}
+              </div>
+              <div v-if="review.id == last_review">
+                <v-textarea
+                  label="Edit comment"
+                  variant="outlined"
+                  style="color: white"
+                  v-show="isHidden"
+                  type="text"
+                  v-if="currentUser.id == review.user_id"
+                  v-model="review.review"
+                ></v-textarea>
+                
+              </div>
+            </div>
+            <div v-if="review.id == last_review">
+              <div
+                style=""
+                @click="editClicked"
+                v-if="review.user_id == currentUser.id"
+              >
+              
+                <div>
+                  <img
+                    v-if="isEditable"
+                    style="cursor: pointer"
+                    :src="editBtn"
+                    alt=""
+                    @click="isHidden = !isHidden"
+                  />
+                </div>
+                <div>
+                  <img
+                    v-show="isHidden"
+                    :src="checkmark"
+                    alt=""
+                    style="cursor: pointer"
+                    @click="updateReview(review.review, review.id)"
+                  />
+                </div>
+              </div>
+              <!-- <div v-if="review.user_id == currentUser.id">update</div> -->
+            </div>
           </div>
         </div>
       </div>
@@ -230,6 +277,8 @@ import imageCompression from "browser-image-compression";
 import addImage from "../assets/add-image.png";
 import arrowRight from "../assets/arrow-right.png";
 import arrowLeft from "../assets/arrow-left.png";
+import editBtn from "../assets/edit.png";
+import checkmark from "../assets/checkmark.png";
 
 export default {
   name: "RestaurantDetail",
@@ -247,7 +296,10 @@ export default {
       addImage: addImage,
       selected_images: [],
       all_images: [],
+      new_rate: null,
+      new_review: "",
       isLoaded: false,
+      isHidden: false,
       colors: [
         "indigo",
         "warning",
@@ -257,6 +309,14 @@ export default {
       ],
       arrowLeft: arrowLeft,
       arrowRight: arrowRight,
+      editBtn: editBtn,
+      checkmark: checkmark,
+      review_date: "",
+      review_time: "",
+      res: null,
+      last_review: null,
+      isEditable: true,
+      isReviewable: true,
       items: [
         { id: 1, imageUrl: "https://picsum.photos/900/500" },
         { id: 2, imageUrl: "https://picsum.photos/900/500" },
@@ -285,10 +345,10 @@ export default {
           temp.push(JSON.parse(element.images));
           //console.log("Prvi Temp: ", temp[0]);
           if (temp[0].length === 1) {
-            console.log("JEDNAKO JE 1");
+            //console.log("JEDNAKO JE 1");
             this.all_images.push(temp[0][0]);
           } else {
-            console.log("VECE OD 1");
+            //console.log("VECE OD 1");
             temp[0].forEach((element) => {
               //console.log("> 1 ELEMENT: ", element);
               this.all_images.push(element);
@@ -298,7 +358,7 @@ export default {
             console.log("element3: ", this.all_images) */
         });
 
-        console.log("daj mi restoran images: ", this.all_images);
+        //console.log("daj mi restoran images: ", this.all_images);
         if (this.all_images.length > 0) {
           this.isLoaded = true;
         }
@@ -316,30 +376,125 @@ export default {
           },
         });
 
-        console.log(
-          "daj mi review od 1 rest 1 user: ",
-          res.data.result[0]
-        );
-        this.rate = res.data.result[0].rate;
-        this.review = res.data.result[0].review;
+        console.log("daj mi review od 1 rest 1 user: ", res.data.result);
+        if (res.data.result.length == 0) {
+          this.isReviewable = true;
+        } else {
+          this.review_date = res.data.result[res.data.result.length -1].date_time.split("T")[0];
+          this.last_review = res.data.result[res.data.result.length -1].review_id
+          this.review_time = res.data.result[0].date_time
+            .split("T")[1]
+            .split(".")[0];
+          this.res = res.data.result;
+          // console.log("res: ", this.res[0].date_time);
+          this.checkDate();
+          this.checkTime();
+          /*           console.log("DATE: ", this.review_date);
+          console.log("TIME: ", this.review_time); */
+        }
+
+        if (res.data.result.length > 0) {
+          this.rate = res.data.result[0].rate;
+        }
+        if (res.data.result.length > 0) {
+          this.review = res.data.result[0].review;
+        }
       } catch (error) {
         console.log(error);
       }
     },
+    async checkDate() {
+      let currentTime = new Date().toISOString().split("T")[1].split(".")[0];
+      let currentDate = new Date().toISOString().split("T")[0];
+      //console.log("date: ", new Date().toISOString() , res.date_time)
+      /* console.log("current date: ", currentDate); */
+      console.log("rewiv date: ", this.review_date);
+      if (this.review_date != currentDate) {
+        // console.log("JESTE");
+
+        this.isReviewable = true;
+      } else {
+        //console.log("NIJE");
+        this.isReviewable = false;
+      }
+    },
+    async checkTime() {
+
+      let currentTime = new Date().toISOString().split("T")[1].split(".")[0];
+      let currentDate = new Date().toISOString().split("T")[0];
+      let result = this.passedTime(
+        new Date().toISOString(),
+        await (this.res.slice(-1))[0].date_time
+      );
+
+      console.log("minutes passed: ", result);
+      if (result < 30 && result >= 0) {
+        //console.log("usao sam");
+        this.isEditable = true;
+        return true;
+      } else {
+        //console.log("dole sam uso");
+        this.isEditable = false;
+        return false;
+      }
+    },
+    editClicked(event) {
+
+      let groupElement = event.target.closest(".review-text");
+      const tableBodyElement = groupElement.querySelector("#review-content");
+      console.log("HIDDEN: ", tableBodyElement.classList.contains("hidden"));
+      if (!tableBodyElement.classList.contains("hidden")) {
+        tableBodyElement.classList.add("hidden");
+      } else {
+        tableBodyElement.classList.remove("hidden");
+      }
+      
+    },
+    returnTrueFalse(x) {
+      return x;
+    },
+    passedTime(startDate, endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const differenceInMilliseconds = Math.abs(end - start);
+      const minutesPassed = Math.floor(differenceInMilliseconds / (1000 * 60));
+      return minutesPassed;
+    },
     async makeReview() {
+      console.log(this.selected_images);
+      try {
+        console.log("da vidimo");
+        let res = await Service.post("/make/review2", {
+          restaurant_id: this.$route.params.id,
+          user_id: this.currentUser.id,
+          rate: this.new_rate,
+          review: this.new_review,
+          image: JSON.stringify(this.selected_images),
+          time: new Date().toISOString(),
+        });
+
+        console.log("daj mi make review: ", res.data.result);
+        this.$router.go();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async updateReview(review, review_id) {
       console.log(this.selected_images);
       try {
         console.log("da vidimo");
         let res = await Service.post("/make/review", {
           restaurant_id: this.$route.params.id,
           user_id: this.currentUser.id,
-          rate: this.rate,
-          review: this.review,
-          image: JSON.stringify(this.selected_images),
+/*           rate: this.rate, */
+          review: review,
+          review_id: review_id,
+/*           image: JSON.stringify(this.selected_images),*/
+          time: new Date().toISOString(), 
         });
 
         console.log("daj mi make review: ", res.data.result);
-        this.$router.go()
+        this.$router.go();
       } catch (error) {
         console.log(error);
       }
@@ -365,7 +520,7 @@ export default {
             id: this.$route.params.id,
           },
         });
-        console.log("daj mi resturan: ", res.data.result);
+        //console.log("daj mi resturan: ", res.data.result);
         this.r = res.data.result[0];
       } catch (error) {
         console.log("error za restoran: ", error);
@@ -463,10 +618,19 @@ export default {
     },
   },
   mounted() {
+    let d = new Date().toISOString();
+
+    console.log(
+      "PROBA ZA TIME: ",
+      new Date().toISOString().split("T")[1].split(".")[0]
+    );
+    console.log("PROBA ZA DATE: ", new Date().toISOString().split("T")[0]);
     this.getRestaurant();
     this.getReviews();
     this.getUserRatingRestaurant();
     this.getAllRestaurantImages();
+    /*     this.checkDate()
+    this.checkTime() */
     /*     $(document).ready(() => {
       $(".slick-carousel").slick();
     }); */
@@ -546,7 +710,7 @@ export default {
   height: 150px;
 }
 .go-back > .title {
-    color: white;
+  color: white;
   font-weight: normal;
 }
 .icon-wraper {
@@ -596,6 +760,9 @@ export default {
   object-fit: cover;
 }
 .review-text {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   background-color: #2b2b2b;
   border-radius: 10px;
   padding: 10px;
@@ -658,5 +825,8 @@ export default {
   width: 50%;
   text-align: center;
   cursor: pointer;
+}
+.hidden {
+  display: none;
 }
 </style>

@@ -450,6 +450,7 @@ export default {
               day: this.day,
               month: this.month,
               year: this.year,
+              date_time: new Date().toISOString(),
             });
 
             console.log("napravi rezervaciju res: ", res);
@@ -468,6 +469,7 @@ export default {
                 day: this.day,
                 month: this.month,
                 year: this.year,
+                date_time: new Date().toISOString(),
               });
 
               console.log("napravi rezervaciju res: ", res);
@@ -483,6 +485,8 @@ export default {
       }
       this.$router.go();
     },
+
+
 
     changeColor(event) {
       const elements = document.querySelectorAll(".termin-item");

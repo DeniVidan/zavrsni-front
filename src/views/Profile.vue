@@ -46,6 +46,46 @@
         <div class="email">{{ currentUser.email }}</div>
       </div>
       <div class="error">{{ error }}</div>
+
+      <div class="edit-card">
+        <div class="item-title" @click="clicked">Add gallery</div>
+        <div class="slide-conteiner">
+          <div id="card-body" class="hidden">
+            <v-col cols="12" style="display: flex">
+              <div
+                class="selected-images"
+                v-for="i in selected_images"
+                :key="i"
+              >
+                <img
+                  class="gallerypic__image"
+                  :src="i"
+                  width="110"
+                  height="110"
+                  @click="removeImage(i)"
+                />
+              </div>
+              <div class="gallerypic">
+                <div @click="openFileExplorer2" class="gallerypic__content">
+                  <img :src="addImage" alt="" />
+                  <span class="gallerypic__text">Upload image</span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="onChange2"
+                  ref="fileInput2"
+                  style="display: none"
+                />
+              </div>
+            </v-col>
+            <div class="button">
+              <div class="" @click="addGallery()">submit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="edit-card">
         <div class="item-title" @click="clicked">Edit profile</div>
         <div class="slide-conteiner">
@@ -121,6 +161,7 @@ import { Auth, Service } from "../services/services";
 import imageCompression from "browser-image-compression";
 import checkmark from "../assets/checkmark.png";
 import xsquare from "../assets/xsquare.png";
+import addImage from "../assets/add-image.png";
 
 export default {
   name: "Profile",
@@ -133,12 +174,16 @@ export default {
       email: Auth.getUserEmail(),
       role: Auth.getUserRole(),
       id: Auth.getUser().id,
+      addImage: addImage,
+      selected_images: [],
+      current_gallery: [],
       password: "",
       newPassword: "",
       isToggle: false,
       error: "",
       changePass: false,
       base64compressed: null,
+      base64compressed2: null,
       currentImage: null,
       reservations: [],
       currentReservations: [],
@@ -256,7 +301,7 @@ export default {
               this.error = "Old password doesnt match";
             }
           } else {
-            this.error = "Something went wrong!"
+            this.error = "Something went wrong!";
           }
         }
       } catch (error) {
@@ -267,6 +312,9 @@ export default {
 
     openFileExplorer() {
       this.$refs.fileInput.click();
+    },
+    openFileExplorer2() {
+      this.$refs.fileInput2.click();
     },
     async onChange(event) {
       try {
@@ -302,6 +350,81 @@ export default {
         console.log("error compresion: ", error);
       }
     },
+    async onChange2(event) {
+      try {
+        const file = event.target.files[0];
+
+        console.log("originalFile instanceof Blob", file instanceof Blob); // true
+        console.log(`originalFile size ${file.size / 1024 / 1024} MB`);
+
+        const options = {
+          maxSizeMB: 0.1,
+          maxWidthOrHeight: 480,
+          useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+
+        console.log(
+          "compressedFile instanceof Blob",
+          compressedFile instanceof Blob
+        ); // true
+        console.log(
+          `compressedFile size ${compressedFile.size / 1024 / 1024} MB`
+        ); // smaller than maxSizeMB
+
+        const reader = new FileReader();
+        reader.readAsDataURL(compressedFile);
+        reader.onload = () => {
+          this.base64compressed2 = reader.result;
+          this.selected_images.push(this.base64compressed2);
+          //console.log("slika: ", this.base64compressed2);
+        };
+      } catch (error) {
+        console.log("error compresion: ", error);
+      }
+      console.log(this.selected_images);
+    },
+
+    async getGallery() {
+      try {
+        let res = await Service.get("/get/gallery", {
+          params: {
+            id: this.currentUser.id,
+          },
+        });
+        res.data.result.forEach((element) => {
+            let temp = JSON.parse(element.image)
+            temp.forEach(element => {
+              this.selected_images.push(element)
+            });
+
+
+        });
+
+      } catch (error) {
+        console.log(error);
+      }
+      //this.selected_images = this.current_gallery;
+    },
+
+    async addGallery() {
+        try {
+          let res = await Service.post("/add/gallery", {
+            id: this.currentUser.id,
+            images: JSON.stringify(this.selected_images),
+          });
+
+          console.log("gallery images: ", res.data.result);
+        } catch (error) {
+          console.log(error);
+        }
+        console.log("c: ", this.current_gallery);
+        console.log("s: ", this.selected_images);
+        this.$router.go();
+      
+    },
+
     async getImage() {
       try {
         let res = await Service.get("/get/profile/image", {
@@ -331,10 +454,19 @@ export default {
         console.log(error);
       }
     },
+
+    removeImage(i) {
+      const index = this.selected_images.indexOf(i);
+      this.selected_images.splice(index, 1);
+
+      console.log("c: ", this.current_gallery);
+      console.log("s: ", this.selected_images);
+    },
   },
   mounted() {
     this.getImage();
     this.getUserReservations();
+    this.getGallery();
   },
 };
 </script>
@@ -476,6 +608,65 @@ export default {
   font-weight: bold;
   color: white;
   border-radius: 10px;
+}
+.gallerypic {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  overflow: hidden;
+  background-color: #a3a3a3;
+}
+
+.gallerypic__content {
+  opacity: 1;
+}
+
+.gallerypic:hover .gallerypic__image {
+  opacity: 0.5;
+}
+
+.gallerypic__image {
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.gallerypic__content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+
+  transition: opacity 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.gallerypic__icon {
+  width: 50px;
+  height: 50px;
+  background: url("@/assets/add-image.png");
+  background-repeat: no-repeat;
+  color: white;
+  padding-bottom: 8px;
+  cursor: pointer;
+}
+
+.gallerypic__text {
+  color: black;
+  font-size: 12px !important;
+  font-weight: bold;
+
+  font-size: 12px;
+  width: 50%;
+  text-align: center;
+  cursor: pointer;
 }
 .hidden {
   display: none;
