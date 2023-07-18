@@ -19,16 +19,52 @@
     </div>
     <div class="content">
       <!-- <img :src="all_images[0]" /> -->
+      <div v-if="selected_review">
+        <v-carousel hide-delimiters v-if="isLoaded">
+          <v-carousel-item
+            cover
+            v-for="(image, index) in all_images"
+            :key="index"
+          >
+            <v-img :src="image" :alt="'Image ' + (index + 1)"></v-img>
+          </v-carousel-item>
+        </v-carousel>
+      </div>
 
-      <v-carousel hide-delimiters v-if="isLoaded">
-        <v-carousel-item
-          cover
-          v-for="(image, index) in all_images"
-          :key="index"
+      <div v-if="selected_gallery">
+        <v-carousel hide-delimiters v-if="isLoaded">
+          <v-carousel-item cover v-for="(image, index) in gallery" :key="index">
+            <v-img :src="image" :alt="'Image ' + (index + 1)"></v-img>
+          </v-carousel-item>
+        </v-carousel>
+      </div>
+
+      <div
+        class="choose-review-gallery-photo"
+        style="
+          display: flex;
+          justify-content: space-evenly;
+          font-size: 25px;
+          color: white;
+        "
+      >
+        <div
+          @click="selectedReview"
+          style="width: 50%; text-align: center; cursor: pointer"
+          id="review-photo-option"
+          class="selected"
         >
-          <v-img :src="image" :alt="'Image ' + (index + 1)"></v-img>
-        </v-carousel-item>
-      </v-carousel>
+          REVIEW PHOTOS
+        </div>
+        <div
+          @click="selectedGallery"
+          style="width: 50%; text-align: center; cursor: pointer"
+          id="gallery-photo-option"
+          class=""
+        >
+          RESTAURANT GALLERY
+        </div>
+      </div>
 
       <div
         class="ml-5 mt-2"
@@ -192,7 +228,7 @@
         <div class="review-button">REVIEWS</div>
         <div class="rate-restaurant"></div>
 
-        <div class="review-card" v-for="review in reviews" :key="review">
+        <div class="review-card" v-for="(review, index) in reviews" :key="index">
           <div class="user-info">
             <div class="user-image">
               <img :src="review.image" width="50" height="50" alt="" />
@@ -219,6 +255,7 @@
               <div class="review-content" id="review-content">
                 {{ review.review }}
               </div>
+
               <div v-if="review.id == last_review">
                 <v-textarea
                   label="Edit comment"
@@ -229,7 +266,6 @@
                   v-if="currentUser.id == review.user_id"
                   v-model="review.review"
                 ></v-textarea>
-                
               </div>
             </div>
             <div v-if="review.id == last_review">
@@ -238,7 +274,6 @@
                 @click="editClicked"
                 v-if="review.user_id == currentUser.id"
               >
-              
                 <div>
                   <img
                     v-if="isEditable"
@@ -257,10 +292,20 @@
                     @click="updateReview(review.review, review.id)"
                   />
                 </div>
+                <div>
+                  <img
+                    v-show="isHidden"
+                    :src="deleteIcon"
+                    alt=""
+                    style="cursor: pointer"
+                    @click="deleteReview(review.id)"
+                  />
+                </div>
               </div>
               <!-- <div v-if="review.user_id == currentUser.id">update</div> -->
             </div>
           </div>
+          <div class="review-images" onload="reviewImage(review.image)"></div>
         </div>
       </div>
     </div>
@@ -279,6 +324,7 @@ import arrowRight from "../assets/arrow-right.png";
 import arrowLeft from "../assets/arrow-left.png";
 import editBtn from "../assets/edit.png";
 import checkmark from "../assets/checkmark.png";
+import deleteIcon from "../assets/delete.png";
 
 export default {
   name: "RestaurantDetail",
@@ -296,9 +342,12 @@ export default {
       addImage: addImage,
       selected_images: [],
       all_images: [],
+      gallery: [],
       new_rate: null,
       new_review: "",
       isLoaded: false,
+      selected_gallery: false,
+      selected_review: true,
       isHidden: false,
       colors: [
         "indigo",
@@ -311,6 +360,7 @@ export default {
       arrowRight: arrowRight,
       editBtn: editBtn,
       checkmark: checkmark,
+      deleteIcon: deleteIcon,
       review_date: "",
       review_time: "",
       res: null,
@@ -367,6 +417,34 @@ export default {
       }
     },
 
+    reviewImage(image) {
+      //let temp = JSON.parse(image)
+      console.log("invdividual review image: ", image);
+    },
+    async getGallery() {
+      try {
+        let res = await Service.get("/get/gallery", {
+          params: {
+            id: this.$route.params.id,
+          },
+        });
+        res.data.result.forEach((element) => {
+          let temp = JSON.parse(element.image);
+          temp.forEach((element) => {
+            this.gallery.push(element);
+          });
+        });
+
+        if (this.gallery.length > 0) {
+          this.isLoaded = true;
+        }
+        console.log("gallery: ", this.gallery);
+      } catch (error) {
+        console.log(error);
+      }
+      //this.selected_images = this.current_gallery;
+    },
+
     async getUserRatingRestaurant() {
       try {
         let res = await Service.get("/user/restaurant/rating", {
@@ -380,8 +458,10 @@ export default {
         if (res.data.result.length == 0) {
           this.isReviewable = true;
         } else {
-          this.review_date = res.data.result[res.data.result.length -1].date_time.split("T")[0];
-          this.last_review = res.data.result[res.data.result.length -1].review_id
+          this.review_date =
+            res.data.result[res.data.result.length - 1].date_time.split("T")[0];
+          this.last_review =
+            res.data.result[res.data.result.length - 1].review_id;
           this.review_time = res.data.result[0].date_time
             .split("T")[1]
             .split(".")[0];
@@ -419,12 +499,11 @@ export default {
       }
     },
     async checkTime() {
-
       let currentTime = new Date().toISOString().split("T")[1].split(".")[0];
       let currentDate = new Date().toISOString().split("T")[0];
       let result = this.passedTime(
         new Date().toISOString(),
-        await (this.res.slice(-1))[0].date_time
+        await this.res.slice(-1)[0].date_time
       );
 
       console.log("minutes passed: ", result);
@@ -439,7 +518,6 @@ export default {
       }
     },
     editClicked(event) {
-
       let groupElement = event.target.closest(".review-text");
       const tableBodyElement = groupElement.querySelector("#review-content");
       console.log("HIDDEN: ", tableBodyElement.classList.contains("hidden"));
@@ -448,7 +526,30 @@ export default {
       } else {
         tableBodyElement.classList.remove("hidden");
       }
-      
+    },
+    selectedReview(event) {
+      let groupElement = event.target.closest(".choose-review-gallery-photo");
+      const firstbutton = groupElement.querySelector("#review-photo-option");
+      const secontbutton = groupElement.querySelector("#gallery-photo-option");
+      //console.log("GIMME: ", firstbutton.classList.contains("selected"));
+      if (!firstbutton.classList.contains("selected")) {
+        firstbutton.classList.add("selected");
+        secontbutton.classList.remove("selected");
+      }
+      this.selected_review = true;
+      this.selected_gallery = false;
+    },
+    selectedGallery(event) {
+      let groupElement = event.target.closest(".choose-review-gallery-photo");
+      const firstbutton = groupElement.querySelector("#gallery-photo-option");
+      const secontbutton = groupElement.querySelector("#review-photo-option");
+      //console.log("GIMME: ", firstbutton.classList.contains("selected"));
+      if (!firstbutton.classList.contains("selected")) {
+        firstbutton.classList.add("selected");
+        secontbutton.classList.remove("selected");
+      }
+      this.selected_review = false;
+      this.selected_gallery = true;
     },
     returnTrueFalse(x) {
       return x;
@@ -486,11 +587,25 @@ export default {
         let res = await Service.post("/make/review", {
           restaurant_id: this.$route.params.id,
           user_id: this.currentUser.id,
-/*           rate: this.rate, */
+          /*           rate: this.rate, */
           review: review,
           review_id: review_id,
-/*           image: JSON.stringify(this.selected_images),*/
-          time: new Date().toISOString(), 
+          /*           image: JSON.stringify(this.selected_images),*/
+          time: new Date().toISOString(),
+        });
+
+        console.log("daj mi make review: ", res.data.result);
+        this.$router.go();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async deleteReview(review_id) {
+      try {
+        let res = await Service.delete("/delete/review", {
+          params: {
+            review_id: review_id,
+          },
         });
 
         console.log("daj mi make review: ", res.data.result);
@@ -617,6 +732,7 @@ export default {
       this.$router.go(-1);
     },
   },
+  
   mounted() {
     let d = new Date().toISOString();
 
@@ -629,6 +745,7 @@ export default {
     this.getReviews();
     this.getUserRatingRestaurant();
     this.getAllRestaurantImages();
+    this.getGallery();
     /*     this.checkDate()
     this.checkTime() */
     /*     $(document).ready(() => {
@@ -828,5 +945,8 @@ export default {
 }
 .hidden {
   display: none;
+}
+.selected {
+  border-bottom: 3px solid #1e90ff;
 }
 </style>

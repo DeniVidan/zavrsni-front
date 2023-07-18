@@ -233,7 +233,6 @@ export default {
       },
       chairImg: chairImg,
       closeImg: closeImg,
-
       proba: {
         value1: [],
         value2: [],
@@ -460,7 +459,7 @@ export default {
         } else {
           if (this.name != "") {
             try {
-              let res = await Service.post("/add/pending", {
+              let res = await Service.post("/make/reservation", {
                 restaurant_id: this.restaurant_id,
                 name: this.name,
                 user_id: this.currentUser.id,
@@ -470,6 +469,9 @@ export default {
                 month: this.month,
                 year: this.year,
                 date_time: new Date().toISOString(),
+                start_time: this.start_time,
+                end_time: this.end_time,
+                email: "000",
               });
 
               console.log("napravi rezervaciju res: ", res);

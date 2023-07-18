@@ -1,5 +1,6 @@
 <template>
   <div class="termin">
+    <div class="err-msg"> {{ message }} </div>
     <div class="card-title">Manage your termin</div>
     <div class="card-lr">
       <div class="left">START</div>
@@ -38,6 +39,7 @@ export default {
       termins: [],
       email: Auth.getUserEmail(),
       currentUser: Auth.getUser(),
+      message: "",
     };
   },
   methods: {
@@ -51,30 +53,61 @@ export default {
         });
 
         this.termins = res.data.result;
+
+        this.checkOverlap(this.termins);
         console.log("daj mi restauran termins: ", this.termins);
       } catch (error) {
         console.log("error za restoran termins: ", error);
       }
     },
 
-
     async removeTermin(index, id) {
-      console.log("termin id: ", id)
+      console.log("termin id: ", id);
       try {
         let res = await Service.delete("/delete/termin", {
           params: {
-            id: id
-          }
-        })
+            id: id,
+          },
+        });
 
-        console.log("termin deletition: ", res)
-        
-        this.termins.splice(index, 1)
+        console.log("termin deletition: ", res);
 
+        this.termins.splice(index, 1);
+        this.checkOverlap(this.termins);
       } catch (error) {
-        console.log("termin deletition error: ", error)
+        console.log("termin deletition error: ", error);
       }
-    }
+    },
+checkOverlap(termin) {
+  let overlapDetected = false;
+  termin.forEach((element1, index1) => {
+    termin.forEach((element2, index2) => {
+      if (index1 !== index2) {
+        const startTime1 = this.getTimeInMinutes(element1.start_time);
+        const endTime1 = this.getTimeInMinutes(element1.end_time);
+        const startTime2 = this.getTimeInMinutes(element2.start_time);
+        const endTime2 = this.getTimeInMinutes(element2.end_time);
+
+        if (startTime1 < endTime2 && endTime1 > startTime2) {
+          overlapDetected = true;
+        } 
+      }
+    });
+  });
+
+  if (overlapDetected) {
+    this.message = "TERMINS ARE OVERLAPPING";
+    return true; // Overlap detected
+  } else {
+    return false; // No overlap
+  }
+},
+
+
+    getTimeInMinutes(timeString) {
+      const [hours, minutes] = timeString.split(":").map(Number);
+      return hours * 60 + minutes;
+    },
   },
   mounted() {
     this.getRestaurantTermins();
@@ -112,7 +145,8 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.start-time, .end-time {
+.start-time,
+.end-time {
   width: 40%;
 }
 input {
@@ -128,5 +162,11 @@ input {
   background: url("@/assets/close.png") center no-repeat;
   width: 100%;
   cursor: pointer;
+}
+.err-msg {
+  color: black;
+  font-weight: bold;
+  font-size: 22px;
+  background-color: rgb(255, 197, 5);
 }
 </style>
