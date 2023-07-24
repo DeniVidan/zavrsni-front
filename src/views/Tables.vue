@@ -99,12 +99,16 @@ export default {
   margin-right: 30px;
 }
 .add-table, .add-termin, .get-table, .get-termin {
-  margin-bottom: 30px
+  margin-bottom: 30px;
+  min-height: 200px;
 }
 .get-table {
   margin-right: 30px !important;
 }
 .text-area {
   background-color: white;
+}
+.get-termin {
+  margin-right: 30px;
 }
 </style>

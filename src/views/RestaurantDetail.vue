@@ -18,6 +18,13 @@
       </div>
     </div>
     <div class="content">
+      <div v-if="selected_gallery">
+        <v-carousel hide-delimiters v-if="isLoaded">
+          <v-carousel-item cover v-for="(image, index) in gallery" :key="index">
+            <v-img :src="image" :alt="'Image ' + (index + 1)"></v-img>
+          </v-carousel-item>
+        </v-carousel>
+      </div>
       <!-- <img :src="all_images[0]" /> -->
       <div v-if="selected_review">
         <v-carousel hide-delimiters v-if="isLoaded">
@@ -26,14 +33,6 @@
             v-for="(image, index) in all_images"
             :key="index"
           >
-            <v-img :src="image" :alt="'Image ' + (index + 1)"></v-img>
-          </v-carousel-item>
-        </v-carousel>
-      </div>
-
-      <div v-if="selected_gallery">
-        <v-carousel hide-delimiters v-if="isLoaded">
-          <v-carousel-item cover v-for="(image, index) in gallery" :key="index">
             <v-img :src="image" :alt="'Image ' + (index + 1)"></v-img>
           </v-carousel-item>
         </v-carousel>
@@ -49,20 +48,20 @@
         "
       >
         <div
-          @click="selectedReview"
-          style="width: 50%; text-align: center; cursor: pointer"
-          id="review-photo-option"
-          class="selected"
-        >
-          REVIEW PHOTOS
-        </div>
-        <div
           @click="selectedGallery"
           style="width: 50%; text-align: center; cursor: pointer"
           id="gallery-photo-option"
-          class=""
+          class="selected"
         >
           RESTAURANT GALLERY
+        </div>
+        <div
+          @click="selectedReview"
+          style="width: 50%; text-align: center; cursor: pointer"
+          id="review-photo-option"
+          class=""
+        >
+          REVIEW PHOTOS
         </div>
       </div>
 
@@ -228,7 +227,11 @@
         <div class="review-button">REVIEWS</div>
         <div class="rate-restaurant"></div>
 
-        <div class="review-card" v-for="(review, index) in reviews" :key="index">
+        <div
+          class="review-card"
+          v-for="(review, index) in reviews"
+          :key="index"
+        >
           <div class="user-info">
             <div class="user-image">
               <img :src="review.image" width="50" height="50" alt="" />
@@ -346,8 +349,8 @@ export default {
       new_rate: null,
       new_review: "",
       isLoaded: false,
-      selected_gallery: false,
-      selected_review: true,
+      selected_gallery: true,
+      selected_review: false,
       isHidden: false,
       colors: [
         "indigo",
@@ -732,7 +735,7 @@ export default {
       this.$router.go(-1);
     },
   },
-  
+
   mounted() {
     let d = new Date().toISOString();
 

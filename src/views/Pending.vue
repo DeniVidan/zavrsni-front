@@ -4,7 +4,7 @@
       <h1>Pending</h1>
     </div>
     <div class="content">
-      <div class="item" style="background-color: transparent">
+<!--       <div class="item" style="background-color: transparent">
         <div class="vertical-align"><b>DATE BOOKED</b></div>
         <div class="vertical-align"><b>TIME BOOKED</b></div>
         <div class="vertical-align"><b>TABLE NAME</b></div>
@@ -25,7 +25,13 @@
           style="padding: 0px 40px"
         >
           <div class="vertical-align">{{ p.date_time.split("T")[0] }}</div>
-          <div class="vertical-align">{{ ((p.date_time.split("T")[1]).split("Z")[0]).split(":")[0] + " : " + ((p.date_time.split("T")[1]).split("Z")[0]).split(":")[1 ] }}</div>
+          <div class="vertical-align">
+            {{
+              p.date_time.split("T")[1].split("Z")[0].split(":")[0] +
+              " : " +
+              p.date_time.split("T")[1].split("Z")[0].split(":")[1]
+            }}
+          </div>
           <div class="vertical-align">{{ p.table_name }}</div>
           <div class="vertical-align">
             {{ p.start_time + "-" + p.end_time }}
@@ -61,15 +67,143 @@
             />
           </div>
         </div>
+
+        <table>
+          <tr style="display: flex; justify-content: space-around">
+            <th><img :src="calendar" alt="" /></th>
+            <th><img :src="time" alt="" /></th>
+            <th><img :src="table" alt="" /></th>
+            <th><img :src="chair2" alt="" /></th>
+            <th><img :src="deadline" alt="" /></th>
+            <th><img :src="users" alt="" /></th>
+            <th>CONFIRM / DECLINE</th>
+          </tr>
+
+          <tr v-for="p in pending" :key="p">
+            <td
+              style="
+                display: flex;
+                justify-content: space-around;
+                margin-bottom: 10px;
+                background-color: #333333;
+              "
+            >
+              <div class="vertical-align">{{ p.date_time.split("T")[0] }}</div>
+              <div class="vertical-align">
+                {{
+                  p.date_time.split("T")[1].split("Z")[0].split(":")[0] +
+                  " : " +
+                  p.date_time.split("T")[1].split("Z")[0].split(":")[1]
+                }}
+              </div>
+              <div class="vertical-align">{{ p.table_name }}</div>
+              <div class="vertical-align">{{ p.table_size }}</div>
+              <div class="vertical-align">
+                {{ p.start_time + "-" + p.end_time }}
+              </div>
+              <div class="vertical-align">{{ p.name }}</div>
+              <div class="vertical-align" style="display: flex">
+                <img
+                  @click="
+                    reserveTable(
+                      p.pending_id,
+                      p.restaurant_id,
+                      p.user_id,
+                      p.table_id,
+                      p.termin_id,
+                      p.day,
+                      p.month,
+                      p.year,
+                      p.email,
+                      p.start_time,
+                      p.end_time,
+                      p.name
+                    )
+                  "
+                  class="btn"
+                  :src="checkmark"
+                  alt=""
+                />
+                <img
+                  @click="rejectReservation(p.pending_id)"
+                  class="btn"
+                  :src="xsquare"
+                  alt=""
+                />
+              </div>
+            </td>
+          </tr>
+        </table> -->
+
+        <v-table theme="dark">
+          <thead>
+            <tr>
+              <th class="text-center"><img :src="calendar" alt="" /></th>
+              <th class="text-center"><img :src="time" alt="" /></th>
+              <th class="text-center"><img :src="table" alt="" /></th>
+              <th class="text-center"><img :src="chair2" alt="" /></th>
+              <th class="text-center"><img :src="deadline" alt="" /></th>
+              <th class="text-center"><img :src="users" alt="" /></th>
+              <th class="text-center">CONFIRM / DECLINE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="p in pending" :key="p">
+              <td>{{ p.date_time.split("T")[0]}}</td>
+              <td>{{ p.date_time.split("T")[1].split("Z")[0].split(":")[0] +
+                  ":" +
+                  p.date_time.split("T")[1].split("Z")[0].split(":")[1] }}</td>
+              <td> {{ p.table_name }} </td>
+              <td> {{ p.table_size }} </td>
+              <td> {{ p.start_time + "-" + p.end_time }} </td>
+              <td> {{ p.name }} </td>
+              <td class="text-center">               
+                <img
+                  @click="
+                    reserveTable(
+                      p.pending_id,
+                      p.restaurant_id,
+                      p.user_id,
+                      p.table_id,
+                      p.termin_id,
+                      p.day,
+                      p.month,
+                      p.year,
+                      p.email,
+                      p.start_time,
+                      p.end_time,
+                      p.name
+                    )
+                  "
+                  class="btn"
+                  :src="checkmark"
+                  alt=""
+                />
+                <img
+                  @click="rejectReservation(p.pending_id)"
+                  class="btn"
+                  :src="xsquare"
+                  alt=""
+                />
+               </td>
+            </tr>
+          </tbody>
+        </v-table>
       </div>
     </div>
-  </div>
+<!--   </div> -->
 </template>
 
 <script>
 import { Auth, Service } from "../services/services";
 import checkmark from "../assets/checkmark.png";
 import xsquare from "../assets/xsquare.png";
+import calendar from "../assets/calendar.png";
+import time from "../assets/time.png";
+import table from "../assets/table.png";
+import deadline from "../assets/deadline.png";
+import users from "../assets/users.png";
+import chair2 from "../assets/chair2.png";
 
 export default {
   name: "Pending",
@@ -78,6 +212,12 @@ export default {
       currentUser: Auth.getUser(),
       checkmark: checkmark,
       xsquare: xsquare,
+      calendar: calendar,
+      time: time,
+      table: table,
+      chair2: chair2,
+      deadline: deadline,
+      users: users,
       pending: [],
     };
   },
@@ -216,6 +356,10 @@ export default {
   margin: auto;
   border-radius: 25px;
   font-size: 20px;
+}
+table {
+  display: flex;
+  flex-direction: column;
 }
 .vertical-align {
   align-self: center;

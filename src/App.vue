@@ -214,4 +214,21 @@ nav a.router-link-exact-active {
   background-color: #1e90ff;
   border-radius: 30px;
 }
+@media screen and (max-width: 600px) {
+  .bottom-navigation {
+    width: 100%;
+    border-radius: 0px;
+  }
+  nav a.router-link-exact-active {
+    margin-bottom: 0px;
+    border-radius: 0px; 
+  }
+  .navigation-button.active,
+.navigation-button:hover {
+  color: white;
+  margin-bottom: 0px;
+  background-color: #5f5f5f;
+  border-radius: 0px;
+}
+}
 </style>

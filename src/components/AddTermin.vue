@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 269px">
     <div id="error" class="error">{{ error }}</div>
     <div class="termin">
       <div class="card-title">Add termin</div>
@@ -7,7 +7,7 @@
         <div class="left">START</div>
         <div class="right">END</div>
       </div>
-      <div v-for="(input, index) in inputs" :key="index">
+      <div style="display: flex;" v-for="(input, index) in inputs" :key="index">
         <input
           type="time"
           :value="input.value1"

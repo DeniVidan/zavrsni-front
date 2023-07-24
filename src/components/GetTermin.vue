@@ -7,7 +7,7 @@
       <div class="right">END</div>
       <div class="delete-row">Remove</div>
     </div>
-    <div class="item" v-for="(termin, index) in termins" :key="index">
+    <div class="item" v-for="(termin, index) in termins" :key="index" :class="{ 'overlapping-termin': termin.isOverlapping }">
       <div class="start-time">
         <input
           type="time"
@@ -78,28 +78,36 @@ export default {
         console.log("termin deletition error: ", error);
       }
     },
-checkOverlap(termin) {
-  let overlapDetected = false;
-  termin.forEach((element1, index1) => {
-    termin.forEach((element2, index2) => {
+checkOverlap(termins) {
+  // Reset isOverlapping for all termins
+  termins.forEach((termin) => {
+    termin.isOverlapping = false;
+  });
+
+  termins.forEach((termin1, index1) => {
+    termins.forEach((termin2, index2) => {
       if (index1 !== index2) {
-        const startTime1 = this.getTimeInMinutes(element1.start_time);
-        const endTime1 = this.getTimeInMinutes(element1.end_time);
-        const startTime2 = this.getTimeInMinutes(element2.start_time);
-        const endTime2 = this.getTimeInMinutes(element2.end_time);
+        const startTime1 = this.getTimeInMinutes(termin1.start_time);
+        const endTime1 = this.getTimeInMinutes(termin1.end_time);
+        const startTime2 = this.getTimeInMinutes(termin2.start_time);
+        const endTime2 = this.getTimeInMinutes(termin2.end_time);
 
         if (startTime1 < endTime2 && endTime1 > startTime2) {
-          overlapDetected = true;
-        } 
+          termin1.isOverlapping = true;
+          termin2.isOverlapping = true;
+        }
       }
     });
   });
 
+  const overlapDetected = termins.some((termin) => termin.isOverlapping);
+
   if (overlapDetected) {
     this.message = "TERMINS ARE OVERLAPPING";
-    return true; // Overlap detected
+    return true;
   } else {
-    return false; // No overlap
+    this.message = "";
+    return false;
   }
 },
 
@@ -168,5 +176,8 @@ input {
   font-weight: bold;
   font-size: 22px;
   background-color: rgb(255, 197, 5);
+}
+.overlapping-termin {
+  border: 2px solid yellow;
 }
 </style>

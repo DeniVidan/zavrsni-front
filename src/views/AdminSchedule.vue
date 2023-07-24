@@ -39,13 +39,14 @@
             <tr>
               <th></th>
               <th
-                style="padding-left: 30px"
+                style="padding-left: 15px; padding-right: 15px;"
                 v-for="(termin, index) in termins"
                 :key="index"
               >
 
-
-                {{ termin.start_time }} - {{ termin.end_time }}
+                <div v-if="termin">
+                  {{ termin.start_time }} - {{ termin.end_time }}
+                </div>
               </th>
             </tr>
 
@@ -79,8 +80,8 @@
                       <div v-if="reservation.firstname">
                         {{ reservation.name }}
                         <img
-                          @click="cancelReservation(reservation.reservation_id)"
-                          style="cursor: pointer"
+                          @click="cancelReservation(reservation.reservation_id, reservation.restaurant_id, reservation.user_id, reservation.email, reservation.firstname, reservation.lastname)"
+                          style="cursor: pointer; vertical-align: middle;"
                           :src="xsquare"
                           alt=""
                           width="20"
@@ -232,10 +233,15 @@ export default {
       this.getReservations();
     },
 
-    async cancelReservation(id) {
+    async cancelReservation(id, restaurant_id, user_id, email, firstname, lastname) {
       let res = await Service.delete("/delete/existing/reservation", {
         params: {
           id: id,
+          restaurant_id: restaurant_id,
+          user_id: user_id, 
+          email: email, 
+          firstname: firstname, 
+          lastname: lastname,
         },
       });
 

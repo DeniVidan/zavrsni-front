@@ -47,11 +47,11 @@
       </div>
       <div class="error">{{ error }}</div>
 
-      <div class="edit-card">
+      <div class="edit-card" v-if="currentUser.role == 'admin'">
         <div class="item-title" @click="clicked">Add gallery</div>
         <div class="slide-conteiner">
           <div id="card-body" class="hidden">
-            <v-col cols="12" style="display: flex">
+            <v-col cols="12" style="display: flex; flex-wrap: wrap;">
               <div
                 class="selected-images"
                 v-for="i in selected_images"
@@ -79,7 +79,7 @@
                 />
               </div>
             </v-col>
-            <div class="button">
+            <div class="button" style="margin-top: 0px;">
               <div class="" @click="addGallery()">submit</div>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default {
               console.log("new user: ", user);
               localStorage.setItem("user", JSON.stringify(user));
 
-              //this.$router.go();
+              this.$router.go();
             } else {
               this.error = "Old password doesnt match";
             }
