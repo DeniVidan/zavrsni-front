@@ -86,6 +86,9 @@ export default {
       this.inputs[index][key] = value;
       //console.log("update input: ", this.inputs[index][key])
     },
+    proba() {
+      console.log("marica")
+    }
   },
   computed: {},
 
@@ -140,6 +143,7 @@ input {
 .button-right {
   width: 50%;
   border-left: 1px solid grey;
+    background: rgb(0, 205, 0);
 }
 ::placeholder {
   font-size: 15px;

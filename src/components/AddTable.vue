@@ -7,17 +7,32 @@
         <div class="left">SIZE</div>
         <div class="right">QUANTITY</div>
       </div>
-      <div class="card-body">
+      <!--       <div class="card-body">
         <div class="table-size-input">
           <input v-model="size" type="number" placeholder="Enter number" />
         </div>
         <div class="table-quantity-input">
           <input v-model="quantity" type="number" placeholder="Enter number" />
         </div>
+      </div> -->
+
+      <div style="display: flex" v-for="(input, index) in inputs" :key="index">
+        <input
+          type="number"
+          :value="input.value1"
+          @input="updateInput(index, 'value1', $event.target.value)"
+          placeholder="Enter number"
+        />
+        <input
+          type="number"
+          :value="input.value2"
+          @input="updateInput(index, 'value2', $event.target.value)"
+          placeholder="Enter number"
+        />
       </div>
 
       <div class="button">
-        <div @click="addTable()" class="button-left">ADD TABLE</div>
+        <div @click="addInput" class="button-left">ADD TABLE</div>
         <div @click="createTables()" class="button-right">CREATE</div>
       </div>
     </div>
@@ -37,6 +52,7 @@ export default {
       },
       size: null,
       quantity: null,
+      inputs: [{ value1: "", value2: "" }],
       error: "",
       currentUser: Auth.getUser(),
     };
@@ -46,8 +62,8 @@ export default {
     tables: Object,
   },
   methods: {
-    addTable() {
-      if (this.size == null || this.quantity == null) {
+    async addTable() {
+      /*       if (this.size == null || this.quantity == null) {
         document.getElementsByClassName("error")[0].style.backgroundColor =
           "#b95555";
         this.error = "Fill all the fields";
@@ -60,10 +76,37 @@ export default {
         this.size = null;
         this.quantity = null;
         console.log("samo da vidim: ", this.tableData.quantity[0]);
-      }
+      } */
     },
     async createTables() {
-      if (this.tableData.size.length == 0) {
+      try {
+        if (this.inputs[0].value1 == "" || this.inputs[0].value2 == "") {
+          document.getElementsByClassName("error")[0].style.backgroundColor =
+            "#b95555";
+          this.error = "Please enter at least 1 table";
+        } else {
+          for (let i = 0; i < this.inputs.length - 1; i++) {
+            if (this.inputs[i].value1 != "" && this.inputs[i].value2 != "") {
+              for (let j = 0; j < this.inputs[i].value2; j++) {
+                console.log(this.inputs[i].value2);
+                let res = await Service.post("/create/tables", {
+                  restaurant_id: this.currentUser.id,
+                  name: "",
+                  size: this.inputs[i].value1,
+                });
+                console.log("daj res table: ", res);
+              }
+            } else {
+              console.log("nema vise stolova za dodati");
+              return;
+            }
+          }
+          this.$router.go();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      /*       if (this.tableData.size.length == 0) {
         document.getElementsByClassName("error")[0].style.backgroundColor =
           "#b95555";
         this.error = "Please enter at least 1 table";
@@ -87,8 +130,30 @@ export default {
         } catch (error) {
           console.log("create tables error: ", error);
         }
-      }
+      } */
       //console.log(this.tableData.size.length);
+    },
+
+    addInput() {
+      const lastInput = this.inputs[this.inputs.length - 1];
+      if (lastInput.value1 !== "" && lastInput.value2 !== "") {
+        document.getElementsByClassName("error")[0].style.backgroundColor = "#4BB543";
+        this.error = "Table added successfully";
+        this.inputs.push({ value1: "", value2: "" });
+      } else {
+        document.getElementsByClassName("error")[0].style.backgroundColor = "#b95555";
+        console.log("Please fill out all inputs before adding a new one.");
+        this.error = "Please enter table";
+      }
+      console.log("samo console.log: ", this.inputs);
+      console.log(
+        "samo console.log: ",
+        this.inputs[this.inputs.length - 1].value1
+      );
+    },
+    updateInput(index, key, value) {
+      this.inputs[index][key] = value;
+      //console.log("update input: ", this.inputs[index][key])
     },
 
     removeTable() {},
@@ -140,6 +205,7 @@ export default {
 .button-right {
   width: 50%;
   border-left: 1px solid grey;
+  background: rgb(0, 205, 0);
 }
 .card-body {
   padding: 0;

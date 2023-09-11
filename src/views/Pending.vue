@@ -4,7 +4,7 @@
       <h1>Pending</h1>
     </div>
     <div class="content">
-<!--       <div class="item" style="background-color: transparent">
+      <!--       <div class="item" style="background-color: transparent">
         <div class="vertical-align"><b>DATE BOOKED</b></div>
         <div class="vertical-align"><b>TIME BOOKED</b></div>
         <div class="vertical-align"><b>TABLE NAME</b></div>
@@ -135,63 +135,72 @@
           </tr>
         </table> -->
 
-        <v-table theme="dark">
-          <thead>
-            <tr>
-              <th class="text-center"><img :src="calendar" alt="" /></th>
-              <th class="text-center"><img :src="time" alt="" /></th>
-              <th class="text-center"><img :src="table" alt="" /></th>
-              <th class="text-center"><img :src="chair2" alt="" /></th>
-              <th class="text-center"><img :src="deadline" alt="" /></th>
-              <th class="text-center"><img :src="users" alt="" /></th>
-              <th class="text-center">CONFIRM / DECLINE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="p in pending" :key="p">
-              <td>{{ p.date_time.split("T")[0]}}</td>
-              <td>{{ p.date_time.split("T")[1].split("Z")[0].split(":")[0] +
-                  ":" +
-                  p.date_time.split("T")[1].split("Z")[0].split(":")[1] }}</td>
-              <td> {{ p.table_name }} </td>
-              <td> {{ p.table_size }} </td>
-              <td> {{ p.start_time + "-" + p.end_time }} </td>
-              <td> {{ p.name }} </td>
-              <td class="text-center">               
-                <img
-                  @click="
-                    reserveTable(
-                      p.pending_id,
-                      p.restaurant_id,
-                      p.user_id,
-                      p.table_id,
-                      p.termin_id,
-                      p.day,
-                      p.month,
-                      p.year,
-                      p.email,
-                      p.start_time,
-                      p.end_time,
-                      p.name
-                    )
-                  "
-                  class="btn"
-                  :src="checkmark"
-                  alt=""
-                />
-                <img
-                  @click="rejectReservation(p.pending_id)"
-                  class="btn"
-                  :src="xsquare"
-                  alt=""
-                />
-               </td>
-            </tr>
-          </tbody>
-        </v-table>
+      <div>
+      <v-table theme="dark">
+        <thead>
+          <tr>
+            <th class="text-center"><img :src="calendar" alt="" /> <p>date</p></th>
+            <th class="text-center"><img :src="time" alt="" /> <p>time</p></th>
+            <th class="text-center"><img :src="table" alt="" /><p>t. name</p></th>
+            <th class="text-center"><img :src="chair2" alt="" /><p>chairs</p></th>
+            <th class="text-center"><img :src="deadline" alt="" /><p>termin</p></th>
+            <th class="text-center"><img :src="users" alt="" /><p>user</p></th>
+            <th class="text-center">CONFIRM / DECLINE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="p in pending" :key="p">
+            <td>{{ p.date_time.split("T")[0] }}</td>
+            <td>
+              {{
+                p.date_time.split("T")[1].split("Z")[0].split(":")[0] +
+                ":" +
+                p.date_time.split("T")[1].split("Z")[0].split(":")[1]
+              }}
+            </td>
+            <td>{{ p.table_name }}</td>
+            <td>{{ p.table_size }}</td>
+            <td>{{ p.start_time + "-" + p.end_time }}</td>
+            <td>{{ p.name }}</td>
+            <td class="text-center">
+              <img
+                @click="
+                  reserveTable(
+                    p.pending_id,
+                    p.restaurant_id,
+                    p.user_id,
+                    p.table_id,
+                    p.termin_id,
+                    p.day,
+                    p.month,
+                    p.year,
+                    p.email,
+                    p.start_time,
+                    p.end_time,
+                    p.name
+                  )
+                "
+                class="btn"
+                :src="checkmark"
+                alt=""
+              />
+              <img
+                @click="rejectReservation(p.pending_id)"
+                class="btn"
+                :src="xsquare"
+                alt=""
+              />
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+      </div>
+            <div v-if="pending.length == 0">
+        <h1>No reservations !</h1>
       </div>
     </div>
-<!--   </div> -->
+  </div>
+  <!--   </div> -->
 </template>
 
 <script>
@@ -333,6 +342,9 @@ export default {
 * {
   color: white;
   text-align: center;
+}
+p {
+  opacity: 0.4;
 }
 .pending {
   margin-bottom: 100px;

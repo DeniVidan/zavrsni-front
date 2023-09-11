@@ -101,33 +101,37 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  const publicSite = ["/getstarted", "/login", "/register", "/register/admin", "/choose"];
+  const publicSite = ["/getstarted", "/login", "/register", "/choose"];
   const adminSite = ["/schedule", "/tables", "/pending"];
   const userSite = ["/", "/restaurant", "/verify"];
+  const superadminSite = ["/register/admin"];
   const userRole = Auth.getUserRole();
   const userActivated = Auth.getUser().verified;
-  console.log("verified: ", userActivated);
-  console.log("user role: ", userRole)
+  //console.log("verified: ", userActivated);
+  //console.log("user role: ", userRole)
   let isAuthenticated = Auth.authenticated();
   const loginRequired = !publicSite.includes(to.path);
   const adminPath = adminSite.includes(to.path);
   const userPath = userSite.includes(to.path);
+  const superadminPath = superadminSite.includes(to.path);
 
   if (!isAuthenticated && loginRequired) {
     next("/login");
   } else if (userActivated === 0 && to.path !== "/verify") {
     next("/verify");
-  } else if (userActivated === 1 && to.path === "/verify") {
+  } else if (userActivated === 1 && to.path === "/verify" && !loginRequired) {
     next("/"); // Redirect to home or other appropriate route
   } else if (isAuthenticated && !loginRequired && userActivated !== 0) {
     next("/");
-  } else if (isAuthenticated && userRole !== "admin" && adminPath) {
+  } else if (isAuthenticated && userRole !== "admin" && userRole !== "superadmin" && (adminPath || superadminPath)) {
     console.log("User access denied to admin site");
     next("/"); // redirect to user site
-  } else if (isAuthenticated && userRole !== "user" && userPath) {
+  } else if (isAuthenticated && userRole !== "user" && userRole !== "superadmin" && (userPath || superadminPath)) {
     // Only redirect to admin site if the current path is in adminSite and doesn't contain any user-specific routes
     console.log("Admin access denied to user site");
     next("/schedule"); // redirect to admin site
+  } else if (isAuthenticated && userRole !== "user" && userRole !== "admin" && (adminPath || userPath)) {
+    next("/register/admin")
   } else {
     next();
   }

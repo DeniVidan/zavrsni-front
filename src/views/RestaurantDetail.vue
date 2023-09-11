@@ -82,7 +82,7 @@
         </div>
 
         <v-row justify="end">
-          <v-dialog v-model="dialog" persistent width="1024">
+          <v-dialog v-model="dialog" width="1024">
             <template v-slot:activator="{ props }">
               <v-btn
                 v-if="isReviewable"
@@ -101,9 +101,9 @@
                 ADD REVIEW
               </v-btn>
             </template>
-            <v-card style="background-color: #e7e7e7">
+            <v-card style="background-color: rgb(39 39 39)">
               <v-card-title>
-                <span class="text-h4">Add review</span>
+                <span class="text-h4" style="color: white">Add review</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
@@ -119,12 +119,13 @@
                           half-increments
                           size="23px"
                         ></v-rating>
-                        <pre>{{ rate }} <span style="font-size: 15px; font-weight: normal;" v-if="!r.avg_rate">NOT RATED YET</span></pre>
+                        <pre>{{ rate }} <span style="font-size: 15px; font-weight: normal; color: white" v-if="!r.avg_rate">NOT RATED YET</span></pre>
                       </div>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="12" style="color: white;">
                       <v-textarea
-                        bg-color="grey"
+                        
+                        bg-color="#2e2e2e"
                         name="input-7-1"
                         variant="filled"
                         label="Write a review"
